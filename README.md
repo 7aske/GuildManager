@@ -8,14 +8,16 @@ A comprehensive guild management addon for World of Warcraft 3.3.5a that provide
   - Name (alphabetically)
   - Level (numeric)
   - Rank/Role (by rank index)
-  - Public Note (alphabetically)
-  - Officer Note (alphabetically)
+  - Note (alphabetically)
+  - Officer's Note (alphabetically)
+  - Class (alphabetically)
 
 - **Real-time Search**: Search guild members by:
   - Name
   - Rank
-  - Public Note
-  - Officer Note
+  - Note
+  - Officer's Note
+  - Class
 
 - **Visual Indicators**:
   - Class-colored names
@@ -104,7 +106,7 @@ Free to use and modify for personal use.
 ## Version History
 
 **v1.0.0** (Initial Release)
-- Sortable columns (Name, Level, Rank, Public Note, Officer Note)
+- Sortable columns (Name, Level, Rank, Note, Officer's Note, Class)
 - Real-time search functionality
 - Class-colored names
 - Online/Offline status indicators

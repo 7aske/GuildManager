@@ -123,6 +123,28 @@
                 </Scripts>
             </Button>
 
+            <!-- Show Offline Members Checkbox -->
+            <CheckButton name="$parentShowOfflineCheckbox" inherits="UICheckButtonTemplate">
+                <Size>
+                    <AbsDimension x="24" y="24"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="LEFT" relativeTo="$parentRefreshButton" relativePoint="RIGHT">
+                        <Offset>
+                            <AbsDimension x="20" y="0"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnLoad>
+                        _G[self:GetName().."Text"]:SetText("Show Offline")
+                    </OnLoad>
+                    <OnClick>
+                        GuildManager:ToggleShowOffline(self:GetChecked())
+                    </OnClick>
+                </Scripts>
+            </CheckButton>
+
             <!-- Column Headers Frame -->
             <Frame name="$parentHeaderFrame">
                 <Size>
@@ -218,7 +240,7 @@
                     </Button>
 
                     <!-- Public Note Header Button -->
-                    <Button name="$parentNoteHeader" text="Public Note" inherits="UIPanelButtonTemplate">
+                    <Button name="$parentNoteHeader" text="Note" inherits="UIPanelButtonTemplate">
                         <Size>
                             <AbsDimension x="190" y="25"/>
                         </Size>
@@ -238,7 +260,7 @@
                     </Button>
 
                     <!-- Officer Note Header Button -->
-                    <Button name="$parentOfficerNoteHeader" text="Officer Note" inherits="UIPanelButtonTemplate">
+                    <Button name="$parentOfficerNoteHeader" text="Officer's Note" inherits="UIPanelButtonTemplate">
                         <Size>
                             <AbsDimension x="190" y="25"/>
                         </Size>
@@ -559,7 +581,7 @@
     <!-- Edit Member Dialog -->
     <Frame name="GuildManagerEditDialog" parent="UIParent" enableMouse="true" movable="true" frameStrata="FULLSCREEN_DIALOG" hidden="true">
         <Size>
-            <AbsDimension x="400" y="300"/>
+            <AbsDimension x="400" y="360"/>
         </Size>
         <Anchors>
             <Anchor point="CENTER"/>
@@ -624,13 +646,13 @@
                     <Anchors>
                         <Anchor point="LEFT" relativeTo="$parentRankLabel" relativePoint="RIGHT">
                             <Offset>
-                                <AbsDimension x="10" y="0"/>
+                                <AbsDimension x="16" y="0"/>
                             </Offset>
                         </Anchor>
                     </Anchors>
                 </FontString>
 
-                <FontString name="$parentPublicNoteLabel" inherits="GameFontNormal" text="Public Note:">
+                <FontString name="$parentPublicNoteLabel" inherits="GameFontNormal" text="Note:">
                     <Anchors>
                         <Anchor point="TOPLEFT">
                             <Offset>
@@ -640,7 +662,7 @@
                     </Anchors>
                 </FontString>
 
-                <FontString name="$parentOfficerNoteLabel" inherits="GameFontNormal" text="Officer Note:">
+                <FontString name="$parentOfficerNoteLabel" inherits="GameFontNormal" text="Officer's Note:">
                     <Anchors>
                         <Anchor point="TOPLEFT">
                             <Offset>
@@ -675,7 +697,7 @@
                 <Anchors>
                     <Anchor point="LEFT" relativeTo="$parentRankValue" relativePoint="RIGHT">
                         <Offset>
-                            <AbsDimension x="10" y="8"/>
+                            <AbsDimension x="60" y="8"/>
                         </Offset>
                     </Anchor>
                 </Anchors>
@@ -767,7 +789,7 @@
                 <Anchors>
                     <Anchor point="TOPLEFT">
                         <Offset>
-                            <AbsDimension x="20" y="-200"/>
+                            <AbsDimension x="20" y="-195"/>
                         </Offset>
                     </Anchor>
                 </Anchors>
@@ -818,7 +840,7 @@
                 <Anchors>
                     <Anchor point="BOTTOM">
                         <Offset>
-                            <AbsDimension x="-55" y="15"/>
+                            <AbsDimension x="-55" y="55"/>
                         </Offset>
                     </Anchor>
                 </Anchors>
@@ -837,7 +859,7 @@
                 <Anchors>
                     <Anchor point="BOTTOM">
                         <Offset>
-                            <AbsDimension x="55" y="15"/>
+                            <AbsDimension x="55" y="55"/>
                         </Offset>
                     </Anchor>
                 </Anchors>
@@ -847,11 +869,52 @@
                     </OnClick>
                 </Scripts>
             </Button>
+
+            <!-- Guild Remove Button -->
+            <Button name="$parentRemoveButton" inherits="UIPanelButtonTemplate" text="Remove from Guild">
+                <Size>
+                    <AbsDimension x="140" y="25"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="BOTTOM">
+                        <Offset>
+                            <AbsDimension x="-75" y="20"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnClick>
+                        GuildManager:RemoveMemberFromGuild()
+                    </OnClick>
+                </Scripts>
+            </Button>
+
+            <!-- Group Invite Button -->
+            <Button name="$parentInviteButton" inherits="UIPanelButtonTemplate" text="Invite to Group">
+                <Size>
+                    <AbsDimension x="140" y="25"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="BOTTOM">
+                        <Offset>
+                            <AbsDimension x="75" y="20"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnClick>
+                        GuildManager:InviteMemberToGroup()
+                    </OnClick>
+                </Scripts>
+            </Button>
         </Frames>
 
         <Scripts>
             <OnLoad>
-                GuildManagerEditDialogTitle:SetText("Edit Guild Member")
+<!--                GuildManagerEditDialogTitle:SetText("Edit Guild Member")-->
+                if not GuildManager:IsSelectedMemberOnline() then
+                    GuildManagerEditDialogInviteButton:Disable()
+                end
             </OnLoad>
             <OnMouseDown>
                 self:StartMoving()

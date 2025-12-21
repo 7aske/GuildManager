@@ -13,6 +13,7 @@ local currentSort = {
 }
 local searchText = ""
 local selectedMember = nil
+local showOfflineMembers = true
 
 -- Initialize the addon
 function GuildManager:OnLoad(frame)
@@ -26,6 +27,9 @@ function GuildManager:OnLoad(frame)
     SlashCmdList["GUILDMANAGER"] = function(msg)
         GuildManager:ToggleFrame()
     end
+
+    -- Initialize showOfflineMembers from the game's current setting
+    showOfflineMembers = GetGuildRosterShowOffline()
 
     DEFAULT_CHAT_FRAME:AddMessage("|cFF00FF00Guild Manager|r v" .. self.version .. " loaded. Type /gman to open.")
 end
@@ -116,6 +120,7 @@ function GuildManager:SortAndFilterMembers()
     local search = string.lower(searchText)
 
     for _, member in ipairs(guildMembers) do
+        -- Filter by search text
         if search == "" or
            string.find(string.lower(member.name), search, 1, true) or
            string.find(string.lower(member.note), search, 1, true) or
@@ -275,6 +280,13 @@ function GuildManager:ToggleFrame()
         GuildManagerFrame:Hide()
     else
         GuildManagerFrame:Show()
+
+        -- Sync the checkbox with the game's current setting
+        showOfflineMembers = GetGuildRosterShowOffline()
+        if GuildManagerFrameShowOfflineCheckbox then
+            GuildManagerFrameShowOfflineCheckbox:SetChecked(showOfflineMembers)
+        end
+
         self:RequestGuildRoster()
         -- Force an immediate update if we already have data
         if #guildMembers > 0 then
@@ -314,7 +326,7 @@ function GuildManager:UpdateHeaderButtons()
         {name = "L", column = "level", button = GuildManagerFrameHeaderFrameLevelHeader},
         {name = "Class", column = "class", button = GuildManagerFrameHeaderFrameClassHeader},
         {name = "Rank", column = "rank", button = GuildManagerFrameHeaderFrameRankHeader},
-        {name = "Public Note", column = "note", button = GuildManagerFrameHeaderFrameNoteHeader},
+        {name = "Note", column = "note", button = GuildManagerFrameHeaderFrameNoteHeader},
         {name = "Officer Note", column = "officernote", button = GuildManagerFrameHeaderFrameOfficerNoteHeader}
     }
 
@@ -356,6 +368,7 @@ function GuildManager:ShowEditDialog(member)
     selectedMember = member
 
     -- Set member info (guard nils)
+    GuildManagerEditDialogTitle:SetText("Edit " .. (member and member.name or ""))
     GuildManagerEditDialogNameValue:SetText(member and member.name or "")
     GuildManagerEditDialogRankValue:SetText(member and member.rank or "")
 
@@ -507,4 +520,55 @@ function GuildManager:SaveMemberEdit()
     -- Hide dialog and refresh
     GuildManagerEditDialog:Hide()
     self:RequestGuildRoster()
+end
+
+-- Toggle showing offline members
+function GuildManager:ToggleShowOffline(checked)
+    showOfflineMembers = checked
+
+    -- Use the game's API to show/hide offline members in the actual guild roster data
+    SetGuildRosterShowOffline(checked)
+
+    -- Request a fresh roster update to get the new data
+    self:RequestGuildRoster()
+end
+
+-- Remove member from guild
+function GuildManager:RemoveMemberFromGuild()
+    if not selectedMember then return end
+    if not IsInGuild() then
+        DEFAULT_CHAT_FRAME:AddMessage("|cFFFF0000Guild Manager: You are not in a guild.|r")
+        return
+    end
+
+    -- Show confirmation dialog
+    StaticPopupDialogs["GUILDMANAGER_REMOVE_CONFIRM"] = {
+        text = "Are you sure you want to remove " .. selectedMember.name .. " from the guild?",
+        button1 = "Yes",
+        button2 = "No",
+        OnAccept = function()
+            DEFAULT_CHAT_FRAME:AddMessage("Guild Manager: Removing " .. selectedMember.name .. " from guild")
+            pcall(function() GuildUninvite(selectedMember.name) end)
+            GuildManagerEditDialog:Hide()
+            GuildManager:RequestGuildRoster()
+        end,
+        timeout = 0,
+        whileDead = true,
+        hideOnEscape = true,
+        preferredIndex = 3,
+    }
+    StaticPopup_Show("GUILDMANAGER_REMOVE_CONFIRM")
+end
+
+-- Invite member to group
+function GuildManager:InviteMemberToGroup()
+    if not selectedMember then return end
+
+    DEFAULT_CHAT_FRAME:AddMessage("|cFF00FF00Guild Manager:|r Inviting " .. selectedMember.name .. " to group")
+    InviteUnit(selectedMember.name)
+end
+
+function GuildManager:IsSelectedMemberOnline()
+    if not selectedMember then return false end
+    return selectedMember.online
 end
