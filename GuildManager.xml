@@ -138,9 +138,9 @@
 
                 <Frames>
                     <!-- Name Header Button -->
-                    <Button name="$parentNameHeader" text="Name">
+                    <Button name="$parentNameHeader" text="Name" inherits="UIPanelButtonTemplate">
                         <Size>
-                            <AbsDimension x="145" y="25"/>
+                            <AbsDimension x="160" y="25"/>
                         </Size>
                         <Anchors>
                             <Anchor point="LEFT">
@@ -149,11 +149,6 @@
                                 </Offset>
                             </Anchor>
                         </Anchors>
-<!--                        <NormalTexture file="Interface\Buttons\UI-Silver-Button-Up"/>-->
-                        <HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
-<!--                        <PushedTexture file="Interface\Buttons\UI-Silver-Button-Down"/>-->
-                        <NormalFont style="GameFontNormalSmall"/>
-                        <HighlightFont style="GameFontHighlightSmall"/>
                         <Scripts>
                             <OnClick>
                                 GuildManager:SortMembers("name")
@@ -163,22 +158,17 @@
                     </Button>
 
                     <!-- Level Header Button -->
-                    <Button name="$parentLevelHeader" text="Lvl">
+                    <Button name="$parentLevelHeader" text="L" inherits="UIPanelButtonTemplate">
                         <Size>
-                            <AbsDimension x="45" y="25"/>
+                            <AbsDimension x="35" y="25"/>
                         </Size>
                         <Anchors>
                             <Anchor point="LEFT" relativeTo="$parentNameHeader" relativePoint="RIGHT">
                                 <Offset>
-                                    <AbsDimension x="10" y="0"/>
+                                    <AbsDimension x="0" y="0"/>
                                 </Offset>
                             </Anchor>
                         </Anchors>
-<!--                        <NormalTexture file="Interface\Buttons\UI-Silver-Button-Up"/>-->
-                        <HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
-<!--                        <PushedTexture file="Interface\Buttons\UI-Silver-Button-Down"/>-->
-                        <NormalFont style="GameFontNormalSmall"/>
-                        <HighlightFont style="GameFontHighlightSmall"/>
                         <Scripts>
                             <OnClick>
                                 GuildManager:SortMembers("level")
@@ -187,23 +177,38 @@
                         </Scripts>
                     </Button>
 
-                    <!-- Rank Header Button -->
-                    <Button name="$parentRankHeader" text="Rank">
+                    <!-- Class Header Button -->
+                    <Button name="$parentClassHeader" text="Class" inherits="UIPanelButtonTemplate">
                         <Size>
-                            <AbsDimension x="115" y="25"/>
+                            <AbsDimension x="75" y="25"/>
                         </Size>
                         <Anchors>
                             <Anchor point="LEFT" relativeTo="$parentLevelHeader" relativePoint="RIGHT">
                                 <Offset>
-                                    <AbsDimension x="10" y="0"/>
+                                    <AbsDimension x="0" y="0"/>
                                 </Offset>
                             </Anchor>
                         </Anchors>
-<!--                        <NormalTexture file="Interface\Buttons\UI-Silver-Button-Up"/>-->
-                        <HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
-<!--                        <PushedTexture file="Interface\Buttons\UI-Silver-Button-Down"/>-->
-                        <NormalFont style="GameFontNormalSmall"/>
-                        <HighlightFont style="GameFontHighlightSmall"/>
+                        <Scripts>
+                            <OnClick>
+                                GuildManager:SortMembers("class")
+                                GuildManager:UpdateHeaderButtons()
+                            </OnClick>
+                        </Scripts>
+                    </Button>
+
+                    <!-- Rank Header Button -->
+                    <Button name="$parentRankHeader" text="Rank" inherits="UIPanelButtonTemplate">
+                        <Size>
+                            <AbsDimension x="115" y="25"/>
+                        </Size>
+                        <Anchors>
+                            <Anchor point="LEFT" relativeTo="$parentClassHeader" relativePoint="RIGHT">
+                                <Offset>
+                                    <AbsDimension x="0" y="0"/>
+                                </Offset>
+                            </Anchor>
+                        </Anchors>
                         <Scripts>
                             <OnClick>
                                 GuildManager:SortMembers("rank")
@@ -213,22 +218,17 @@
                     </Button>
 
                     <!-- Public Note Header Button -->
-                    <Button name="$parentNoteHeader" text="Public Note">
+                    <Button name="$parentNoteHeader" text="Public Note" inherits="UIPanelButtonTemplate">
                         <Size>
-                            <AbsDimension x="195" y="25"/>
+                            <AbsDimension x="190" y="25"/>
                         </Size>
                         <Anchors>
                             <Anchor point="LEFT" relativeTo="$parentRankHeader" relativePoint="RIGHT">
                                 <Offset>
-                                    <AbsDimension x="10" y="0"/>
+                                    <AbsDimension x="0" y="0"/>
                                 </Offset>
                             </Anchor>
                         </Anchors>
-<!--                        <NormalTexture file="Interface\Buttons\UI-Silver-Button-Up"/>-->
-                        <HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
-<!--                        <PushedTexture file="Interface\Buttons\UI-Silver-Button-Down"/>-->
-                        <NormalFont style="GameFontNormalSmall"/>
-                        <HighlightFont style="GameFontHighlightSmall"/>
                         <Scripts>
                             <OnClick>
                                 GuildManager:SortMembers("note")
@@ -238,22 +238,17 @@
                     </Button>
 
                     <!-- Officer Note Header Button -->
-                    <Button name="$parentOfficerNoteHeader" text="Officer Note">
+                    <Button name="$parentOfficerNoteHeader" text="Officer Note" inherits="UIPanelButtonTemplate">
                         <Size>
-                            <AbsDimension x="195" y="25"/>
+                            <AbsDimension x="190" y="25"/>
                         </Size>
                         <Anchors>
                             <Anchor point="LEFT" relativeTo="$parentNoteHeader" relativePoint="RIGHT">
                                 <Offset>
-                                    <AbsDimension x="10" y="0"/>
+                                    <AbsDimension x="0" y="0"/>
                                 </Offset>
                             </Anchor>
                         </Anchors>
-<!--                        <NormalTexture file="Interface\Buttons\UI-Silver-Button-Up"/>-->
-                        <HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
-<!--                        <PushedTexture file="Interface\Buttons\UI-Silver-Button-Down"/>-->
-                        <NormalFont style="GameFontNormalSmall"/>
-                        <HighlightFont style="GameFontHighlightSmall"/>
                         <Scripts>
                             <OnClick>
                                 GuildManager:SortMembers("officernote")
@@ -295,6 +290,11 @@
             <OnShow>
                 GuildManager:RequestGuildRoster()
             </OnShow>
+            <OnHide>
+                if GuildManagerEditDialog then
+                    GuildManagerEditDialog:Hide()
+                end
+            </OnHide>
             <OnMouseDown>
                 self:StartMoving()
             </OnMouseDown>
@@ -348,9 +348,9 @@
                         </Anchor>
                     </Anchors>
                 </FontString>
-                <FontString name="$parentRank" inherits="GameFontNormalSmall" justifyH="LEFT" nonspacewrap="true" maxLines="1">
+                <FontString name="$parentClass" inherits="GameFontNormalSmall" justifyH="LEFT" nonspacewrap="true" maxLines="1">
                     <Size>
-                        <AbsDimension x="115" y="20"/>
+                        <AbsDimension x="75" y="20"/>
                     </Size>
                     <Anchors>
                         <Anchor point="LEFT" relativeTo="$parentLevel" relativePoint="RIGHT">
@@ -360,9 +360,21 @@
                         </Anchor>
                     </Anchors>
                 </FontString>
+                <FontString name="$parentRank" inherits="GameFontNormalSmall" justifyH="LEFT" nonspacewrap="true" maxLines="1">
+                    <Size>
+                        <AbsDimension x="115" y="20"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="LEFT" relativeTo="$parentClass" relativePoint="RIGHT">
+                            <Offset>
+                                <AbsDimension x="5" y="0"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </FontString>
                 <FontString name="$parentNote" inherits="GameFontNormalSmall" justifyH="LEFT" nonspacewrap="true" maxLines="1">
                     <Size>
-                        <AbsDimension x="195" y="20"/>
+                        <AbsDimension x="190" y="20"/>
                     </Size>
                     <Anchors>
                         <Anchor point="LEFT" relativeTo="$parentRank" relativePoint="RIGHT">
@@ -374,7 +386,7 @@
                 </FontString>
                 <FontString name="$parentOfficerNote" inherits="GameFontNormalSmall" justifyH="LEFT" nonspacewrap="true" maxLines="1">
                     <Size>
-                        <AbsDimension x="195" y="20"/>
+                        <AbsDimension x="190" y="20"/>
                     </Size>
                     <Anchors>
                         <Anchor point="LEFT" relativeTo="$parentNote" relativePoint="RIGHT">
@@ -390,6 +402,7 @@
             <OnLoad>
                 self.nameText = _G[self:GetName().."Name"]
                 self.levelText = _G[self:GetName().."Level"]
+                self.classText = _G[self:GetName().."Class"]
                 self.rankText = _G[self:GetName().."Rank"]
                 self.noteText = _G[self:GetName().."Note"]
                 self.officerNoteText = _G[self:GetName().."OfficerNote"]
@@ -649,6 +662,49 @@
                         </Offset>
                     </Anchor>
                 </Anchors>
+            </Button>
+
+            <!-- Add Promote / Demote buttons next to RankValue -->
+            <Button name="$parentPromoteButton" inherits="UIPanelButtonTemplate">
+                <NormalTexture file="Interface\Buttons\UI-ScrollBar-ScrollUpButton-Up"/>
+                <PushedTexture file="Interface\Buttons\UI-ScrollBar-ScrollUpButton-Down"/>
+                <DisabledTexture file="Interface\Buttons\UI-ScrollBar-ScrollUpButton-Disabled"/>
+                <Size>
+                    <AbsDimension x="24" y="20"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="LEFT" relativeTo="$parentRankValue" relativePoint="RIGHT">
+                        <Offset>
+                            <AbsDimension x="10" y="8"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnClick>
+                        GuildManager:PromoteSelectedMember()
+                    </OnClick>
+                </Scripts>
+            </Button>
+
+            <Button name="$parentDemoteButton" inherits="UIPanelButtonTemplate">
+                <NormalTexture file="Interface\Buttons\UI-ScrollBar-ScrollDownButton-Up"/>
+                <PushedTexture file="Interface\Buttons\UI-ScrollBar-ScrollDownButton-Down"/>
+                <DisabledTexture file="Interface\Buttons\UI-ScrollBar-ScrollDownButton-Disabled"/>
+                <Size>
+                    <AbsDimension x="24" y="20"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="LEFT" relativeTo="$parentPromoteButton" relativePoint="RIGHT">
+                        <Offset>
+                            <AbsDimension x="-24" y="-16"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnClick>
+                        GuildManager:DemoteSelectedMember()
+                    </OnClick>
+                </Scripts>
             </Button>
 
             <!-- Public Note Edit Box -->

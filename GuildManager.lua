@@ -83,6 +83,17 @@ function GuildManager:UpdateGuildRoster()
     end
 
     self:SortAndFilterMembers()
+
+    -- If edit dialog is open, refresh it with the latest data for the selected member
+    if GuildManagerEditDialog and GuildManagerEditDialog:IsShown() and selectedMember and selectedMember.name then
+        for _, m in ipairs(guildMembers) do
+            if m.name == selectedMember.name then
+                selectedMember = m
+                self:ShowEditDialog(selectedMember)
+                break
+            end
+        end
+    end
 end
 
 -- Sort members by column
@@ -109,7 +120,8 @@ function GuildManager:SortAndFilterMembers()
            string.find(string.lower(member.name), search, 1, true) or
            string.find(string.lower(member.note), search, 1, true) or
            string.find(string.lower(member.officernote), search, 1, true) or
-           string.find(string.lower(member.rank), search, 1, true) then
+           string.find(string.lower(member.rank), search, 1, true) or
+           string.find(string.lower(member.class), search, 1, true) then
             table.insert(filteredMembers, member)
         end
     end
@@ -129,6 +141,8 @@ function GuildManager:SortAndFilterMembers()
             aVal, bVal = a.officernote, b.officernote
         elseif column == "level" then
             aVal, bVal = a.level, b.level
+        elseif column == "class" then
+            aVal, bVal = a.class, b.class
         else
             aVal, bVal = a.name, b.name
         end
@@ -150,7 +164,7 @@ function GuildManager:UpdateScrollFrame(members)
         return
     end
 
-    DEFAULT_CHAT_FRAME:AddMessage("Guild Manager: UpdateScrollFrame called with " .. #members .. " members")
+--     DEFAULT_CHAT_FRAME:AddMessage("Guild Manager: UpdateScrollFrame called with " .. #members .. " members")
 
     local scrollFrame = GuildManagerScrollFrame
     if not scrollFrame then
@@ -176,6 +190,7 @@ function GuildManager:UpdateScrollFrame(members)
                 -- Try to initialize manually
                 button.nameText = _G["GuildManagerEntry"..i.."Name"]
                 button.levelText = _G["GuildManagerEntry"..i.."Level"]
+                button.classText = _G["GuildManagerEntry"..i.."Class"]
                 button.rankText = _G["GuildManagerEntry"..i.."Rank"]
                 button.noteText = _G["GuildManagerEntry"..i.."Note"]
                 button.officerNoteText = _G["GuildManagerEntry"..i.."OfficerNote"]
@@ -184,7 +199,7 @@ function GuildManager:UpdateScrollFrame(members)
             if index <= #members then
                 local member = members[index]
 
-                DEFAULT_CHAT_FRAME:AddMessage("Setting button " .. index .. " to member: " .. member.name)
+--                 DEFAULT_CHAT_FRAME:AddMessage("Setting button " .. index .. " to member: " .. member.name)
 
                 -- Store the member data on the button for later access
                 button.memberData = member
@@ -199,8 +214,16 @@ function GuildManager:UpdateScrollFrame(members)
                     button.nameText:SetText(member.name)
                 end
 
-                -- Set level and class
+                -- Set level
                 button.levelText:SetText(member.level)
+
+                -- Set class with class color
+                if classColor then
+                    local colorStr = string.format("%02x%02x%02x", classColor.r * 255, classColor.g * 255, classColor.b * 255)
+                    button.classText:SetText("|cff" .. colorStr .. member.class .. "|r")
+                else
+                    button.classText:SetText(member.class)
+                end
 
                 -- Set rank (role)
                 button.rankText:SetText(member.rank)
@@ -215,28 +238,30 @@ function GuildManager:UpdateScrollFrame(members)
                 if member.online then
                     button.nameText:SetAlpha(1.0)
                     button.levelText:SetAlpha(1.0)
+                    button.classText:SetAlpha(1.0)
                     button.rankText:SetAlpha(1.0)
                     button.noteText:SetAlpha(1.0)
                     button.officerNoteText:SetAlpha(1.0)
                 else
                     button.nameText:SetAlpha(0.5)
                     button.levelText:SetAlpha(0.5)
+                    button.classText:SetAlpha(0.5)
                     button.rankText:SetAlpha(0.5)
                     button.noteText:SetAlpha(0.5)
                     button.officerNoteText:SetAlpha(0.5)
                 end
 
                 button:Show()
-                DEFAULT_CHAT_FRAME:AddMessage("Showing button " .. index .. " for member: " .. member.name)
+--                 DEFAULT_CHAT_FRAME:AddMessage("Showing button " .. index .. " for member: " .. member.name)
             else
                 button.memberData = nil
                 button:Hide()
-                DEFAULT_CHAT_FRAME:AddMessage("Hiding button " .. i .. " (no member)")
+--                 DEFAULT_CHAT_FRAME:AddMessage("Hiding button " .. i .. " (no member)")
             end
         end
     end
 
-    DEFAULT_CHAT_FRAME:AddMessage("Guild Manager: UpdateScrollFrame completed")
+--     DEFAULT_CHAT_FRAME:AddMessage("Guild Manager: UpdateScrollFrame completed")
 end
 
 -- Toggle the main frame
@@ -261,7 +286,7 @@ end
 -- Search function
 function GuildManager:SetSearchText(text)
     searchText = text or ""
-    DEFAULT_CHAT_FRAME:AddMessage("Guild Manager: Searching for '" .. searchText .. "'")
+--     DEFAULT_CHAT_FRAME:AddMessage("Guild Manager: Searching for '" .. searchText .. "'")
     FauxScrollFrame_SetOffset(GuildManagerScrollFrame, 0)
     self:SortAndFilterMembers()
 end
@@ -286,7 +311,8 @@ function GuildManager:UpdateHeaderButtons()
 
     local headers = {
         {name = "Name", column = "name", button = GuildManagerFrameHeaderFrameNameHeader},
-        {name = "Lvl", column = "level", button = GuildManagerFrameHeaderFrameLevelHeader},
+        {name = "L", column = "level", button = GuildManagerFrameHeaderFrameLevelHeader},
+        {name = "Class", column = "class", button = GuildManagerFrameHeaderFrameClassHeader},
         {name = "Rank", column = "rank", button = GuildManagerFrameHeaderFrameRankHeader},
         {name = "Public Note", column = "note", button = GuildManagerFrameHeaderFrameNoteHeader},
         {name = "Officer Note", column = "officernote", button = GuildManagerFrameHeaderFrameOfficerNoteHeader}
@@ -316,24 +342,129 @@ function GuildManager:ShowEditDialog(member)
         return
     end
 
-    -- Set member info
-    GuildManagerEditDialogNameValue:SetText(member.name)
-    GuildManagerEditDialogRankValue:SetText(member.rank)
+    -- Use the freshest member object from guildMembers (match by name) if available
+    if member and member.name then
+        for _, m in ipairs(guildMembers) do
+            if m.name == member.name then
+                member = m
+                break
+            end
+        end
+    end
+
+    -- update global selectedMember reference
+    selectedMember = member
+
+    -- Set member info (guard nils)
+    GuildManagerEditDialogNameValue:SetText(member and member.name or "")
+    GuildManagerEditDialogRankValue:SetText(member and member.rank or "")
 
     -- Set notes in edit boxes (access the EditBox inside the ScrollFrame)
     local publicNoteEdit = GuildManagerEditDialogPublicNoteScrollEdit
     local officerNoteEdit = GuildManagerEditDialogOfficerNoteScrollEdit
 
     if publicNoteEdit then
-        publicNoteEdit:SetText(member.note)
+        publicNoteEdit:SetText((member and member.note) or "")
     end
 
     if officerNoteEdit then
-        officerNoteEdit:SetText(member.officernote)
+        officerNoteEdit:SetText((member and member.officernote) or "")
+    end
+
+    -- Update Promote/Demote button enabled state
+    do
+        -- find max rankIndex present in cached guildMembers
+        local maxRankIndex = 0
+        for _, m in ipairs(guildMembers) do
+            if m.rankIndex and m.rankIndex > maxRankIndex then
+                maxRankIndex = m.rankIndex
+            end
+        end
+
+        local promoteBtn = GuildManagerEditDialogPromoteButton
+        local demoteBtn = GuildManagerEditDialogDemoteButton
+
+        if promoteBtn then
+            if member and member.rankIndex and member.rankIndex > 0 then
+                promoteBtn:Enable()
+            else
+                promoteBtn:Disable()
+            end
+        end
+
+        if demoteBtn then
+            if member and member.rankIndex and member.rankIndex < maxRankIndex then
+                demoteBtn:Enable()
+            else
+                demoteBtn:Disable()
+            end
+        end
     end
 
     -- Show the dialog
     GuildManagerEditDialog:Show()
+end
+
+-- Promote selected member (calls Blizzard API)
+function GuildManager:PromoteSelectedMember()
+    if not selectedMember then return end
+    if not IsInGuild() then
+        DEFAULT_CHAT_FRAME:AddMessage("|cFFFF0000Guild Manager: You are not in a guild.|r")
+        return
+    end
+
+    DEFAULT_CHAT_FRAME:AddMessage("Guild Manager: Promoting " .. selectedMember.name)
+    -- Call the Blizzard API to promote (name is used here)
+    -- Note: the default API is GuildPromote(name) in classic/older APIs
+    pcall(function() GuildPromote(selectedMember.name) end)
+
+    -- Refresh roster and update dialog shortly after
+    self:RequestGuildRoster()
+    -- schedule a small delay to allow server update, then refresh dialog display
+    if C_Timer and C_Timer.After then
+        C_Timer.After(0.5, function()
+            -- Update selectedMember info from latest guildMembers (match by name)
+            for _, m in ipairs(guildMembers) do
+                if m.name == selectedMember.name then
+                    selectedMember = m
+                    GuildManagerEditDialogRankValue:SetText(m.rank)
+                    break
+                end
+            end
+            -- update button states
+            if GuildManagerEditDialog:IsShown() then
+                GuildManager:ShowEditDialog(selectedMember)
+            end
+        end)
+    end
+end
+
+-- Demote selected member (calls Blizzard API)
+function GuildManager:DemoteSelectedMember()
+    if not selectedMember then return end
+    if not IsInGuild() then
+        DEFAULT_CHAT_FRAME:AddMessage("|cFFFF0000Guild Manager: You are not in a guild.|r")
+        return
+    end
+
+    DEFAULT_CHAT_FRAME:AddMessage("Guild Manager: Demoting " .. selectedMember.name)
+    pcall(function() GuildDemote(selectedMember.name) end)
+
+    self:RequestGuildRoster()
+    if C_Timer and C_Timer.After then
+        C_Timer.After(0.5, function()
+            for _, m in ipairs(guildMembers) do
+                if m.name == selectedMember.name then
+                    selectedMember = m
+                    GuildManagerEditDialogRankValue:SetText(m.rank)
+                    break
+                end
+            end
+            if GuildManagerEditDialog:IsShown() then
+                GuildManager:ShowEditDialog(selectedMember)
+            end
+        end)
+    end
 end
 
 -- Save member edit
@@ -354,12 +485,24 @@ function GuildManager:SaveMemberEdit()
     local publicNote = publicNoteEdit:GetText()
     local officerNote = officerNoteEdit:GetText()
 
-    -- Use WoW API to set guild member notes
-    -- Note: You need appropriate guild permissions to edit notes
-    GuildRosterSetPublicNote(selectedMember.index, publicNote)
-    GuildRosterSetOfficerNote(selectedMember.index, officerNote)
+    -- Find the current member index from the refreshed guildMembers (safer than trusting stored index)
+    local memberIndex = selectedMember.index
+    for _, m in ipairs(guildMembers) do
+        if m.name == selectedMember.name then
+            memberIndex = m.index
+            break
+        end
+    end
 
-    DEFAULT_CHAT_FRAME:AddMessage("|cFF00FF00Guild Manager:|r Updated notes for " .. selectedMember.name)
+    if memberIndex then
+        -- Use WoW API to set guild member notes (requires permission)
+        GuildRosterSetPublicNote(memberIndex, publicNote)
+        GuildRosterSetOfficerNote(memberIndex, officerNote)
+
+        DEFAULT_CHAT_FRAME:AddMessage("|cFF00FF00Guild Manager:|r Updated notes for " .. selectedMember.name)
+    else
+        DEFAULT_CHAT_FRAME:AddMessage("|cFFFF0000Guild Manager:|r Could not find member index to save notes.")
+    end
 
     -- Hide dialog and refresh
     GuildManagerEditDialog:Hide()
