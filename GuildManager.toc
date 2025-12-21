@@ -1,0 +1,10 @@
+## Interface: 30300
+## Title: Guild Manager
+## Notes: Advanced guild member management with sorting and searching
+## Author: Nikola Tasic
+## Version: 1.0.0
+## SavedVariables: GuildManagerDB
+
+GuildManager.lua
+GuildManager.xml
+

@@ -1,0 +1,810 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
+
+    <!-- Main Frame -->
+    <Frame name="GuildManagerFrame" parent="UIParent" enableMouse="true" movable="true" frameStrata="MEDIUM" hidden="true">
+        <Size>
+            <AbsDimension x="800" y="500"/>
+        </Size>
+        <Anchors>
+            <Anchor point="CENTER"/>
+        </Anchors>
+
+        <Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+            <BackgroundInsets>
+                <AbsInset left="11" right="12" top="12" bottom="11"/>
+            </BackgroundInsets>
+            <TileSize>
+                <AbsValue val="32"/>
+            </TileSize>
+            <EdgeSize>
+                <AbsValue val="32"/>
+            </EdgeSize>
+        </Backdrop>
+
+        <Layers>
+            <Layer level="ARTWORK">
+                <FontString name="$parentTitle" inherits="GameFontNormalLarge">
+                    <Anchors>
+                        <Anchor point="TOP" relativePoint="TOP">
+                            <Offset>
+                                <AbsDimension x="0" y="-15"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </FontString>
+            </Layer>
+        </Layers>
+
+        <Frames>
+            <!-- Close Button -->
+            <Button name="$parentCloseButton" inherits="UIPanelCloseButton">
+                <Anchors>
+                    <Anchor point="TOPRIGHT">
+                        <Offset>
+                            <AbsDimension x="-5" y="-5"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+            </Button>
+
+            <!-- Search Box -->
+            <EditBox name="$parentSearchBox" autoFocus="false">
+                <Size>
+                    <AbsDimension x="300" y="30"/>
+                </Size>
+                <TextInsets>
+                    <AbsInset left="6" right="6" top="2" bottom="2"/>
+                </TextInsets>
+                <Anchors>
+                    <Anchor point="TOPLEFT">
+                        <Offset>
+                            <AbsDimension x="20" y="-45"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+
+                <Backdrop bgFile="Interface\ChatFrame\ChatFrameBackground" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+                    <EdgeSize>
+                        <AbsValue val="16"/>
+                    </EdgeSize>
+                    <TileSize>
+                        <AbsValue val="16"/>
+                    </TileSize>
+                    <BackgroundInsets>
+                        <AbsInset left="4" right="4" top="4" bottom="4"/>
+                    </BackgroundInsets>
+                    <Color r="0" g="0" b="0" a="0.5"/>
+                </Backdrop>
+
+                <FontString inherits="ChatFontNormal"/>
+
+                <Scripts>
+                    <OnTextChanged>
+                        if self:HasFocus() then
+                            GuildManager:SetSearchText(self:GetText())
+                        end
+                    </OnTextChanged>
+                    <OnEscapePressed>
+                        self:ClearFocus()
+                    </OnEscapePressed>
+                    <OnEnterPressed>
+                        self:ClearFocus()
+                    </OnEnterPressed>
+                </Scripts>
+            </EditBox>
+
+            <!-- Search Label -->
+            <FontString name="$parentSearchLabel" inherits="GameFontNormal" text="Search:">
+                <Anchors>
+                    <Anchor point="RIGHT" relativeTo="$parentSearchBox" relativePoint="LEFT">
+                        <Offset>
+                            <AbsDimension x="-5" y="0"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+            </FontString>
+
+            <!-- Refresh Button -->
+            <Button name="$parentRefreshButton" inherits="UIPanelButtonTemplate" text="Refresh">
+                <Size>
+                    <AbsDimension x="100" y="25"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="LEFT" relativeTo="$parentSearchBox" relativePoint="RIGHT">
+                        <Offset>
+                            <AbsDimension x="20" y="0"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnClick>
+                        GuildManager:RefreshRoster()
+                    </OnClick>
+                </Scripts>
+            </Button>
+
+            <!-- Column Headers Frame -->
+            <Frame name="$parentHeaderFrame">
+                <Size>
+                    <AbsDimension x="760" y="25"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="TOPLEFT">
+                        <Offset>
+                            <AbsDimension x="20" y="-85"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+
+                <Frames>
+                    <!-- Name Header Button -->
+                    <Button name="$parentNameHeader" text="Name">
+                        <Size>
+                            <AbsDimension x="145" y="25"/>
+                        </Size>
+                        <Anchors>
+                            <Anchor point="LEFT">
+                                <Offset>
+                                    <AbsDimension x="0" y="0"/>
+                                </Offset>
+                            </Anchor>
+                        </Anchors>
+<!--                        <NormalTexture file="Interface\Buttons\UI-Silver-Button-Up"/>-->
+                        <HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+<!--                        <PushedTexture file="Interface\Buttons\UI-Silver-Button-Down"/>-->
+                        <NormalFont style="GameFontNormalSmall"/>
+                        <HighlightFont style="GameFontHighlightSmall"/>
+                        <Scripts>
+                            <OnClick>
+                                GuildManager:SortMembers("name")
+                                GuildManager:UpdateHeaderButtons()
+                            </OnClick>
+                        </Scripts>
+                    </Button>
+
+                    <!-- Level Header Button -->
+                    <Button name="$parentLevelHeader" text="Lvl">
+                        <Size>
+                            <AbsDimension x="45" y="25"/>
+                        </Size>
+                        <Anchors>
+                            <Anchor point="LEFT" relativeTo="$parentNameHeader" relativePoint="RIGHT">
+                                <Offset>
+                                    <AbsDimension x="10" y="0"/>
+                                </Offset>
+                            </Anchor>
+                        </Anchors>
+<!--                        <NormalTexture file="Interface\Buttons\UI-Silver-Button-Up"/>-->
+                        <HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+<!--                        <PushedTexture file="Interface\Buttons\UI-Silver-Button-Down"/>-->
+                        <NormalFont style="GameFontNormalSmall"/>
+                        <HighlightFont style="GameFontHighlightSmall"/>
+                        <Scripts>
+                            <OnClick>
+                                GuildManager:SortMembers("level")
+                                GuildManager:UpdateHeaderButtons()
+                            </OnClick>
+                        </Scripts>
+                    </Button>
+
+                    <!-- Rank Header Button -->
+                    <Button name="$parentRankHeader" text="Rank">
+                        <Size>
+                            <AbsDimension x="115" y="25"/>
+                        </Size>
+                        <Anchors>
+                            <Anchor point="LEFT" relativeTo="$parentLevelHeader" relativePoint="RIGHT">
+                                <Offset>
+                                    <AbsDimension x="10" y="0"/>
+                                </Offset>
+                            </Anchor>
+                        </Anchors>
+<!--                        <NormalTexture file="Interface\Buttons\UI-Silver-Button-Up"/>-->
+                        <HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+<!--                        <PushedTexture file="Interface\Buttons\UI-Silver-Button-Down"/>-->
+                        <NormalFont style="GameFontNormalSmall"/>
+                        <HighlightFont style="GameFontHighlightSmall"/>
+                        <Scripts>
+                            <OnClick>
+                                GuildManager:SortMembers("rank")
+                                GuildManager:UpdateHeaderButtons()
+                            </OnClick>
+                        </Scripts>
+                    </Button>
+
+                    <!-- Public Note Header Button -->
+                    <Button name="$parentNoteHeader" text="Public Note">
+                        <Size>
+                            <AbsDimension x="195" y="25"/>
+                        </Size>
+                        <Anchors>
+                            <Anchor point="LEFT" relativeTo="$parentRankHeader" relativePoint="RIGHT">
+                                <Offset>
+                                    <AbsDimension x="10" y="0"/>
+                                </Offset>
+                            </Anchor>
+                        </Anchors>
+<!--                        <NormalTexture file="Interface\Buttons\UI-Silver-Button-Up"/>-->
+                        <HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+<!--                        <PushedTexture file="Interface\Buttons\UI-Silver-Button-Down"/>-->
+                        <NormalFont style="GameFontNormalSmall"/>
+                        <HighlightFont style="GameFontHighlightSmall"/>
+                        <Scripts>
+                            <OnClick>
+                                GuildManager:SortMembers("note")
+                                GuildManager:UpdateHeaderButtons()
+                            </OnClick>
+                        </Scripts>
+                    </Button>
+
+                    <!-- Officer Note Header Button -->
+                    <Button name="$parentOfficerNoteHeader" text="Officer Note">
+                        <Size>
+                            <AbsDimension x="195" y="25"/>
+                        </Size>
+                        <Anchors>
+                            <Anchor point="LEFT" relativeTo="$parentNoteHeader" relativePoint="RIGHT">
+                                <Offset>
+                                    <AbsDimension x="10" y="0"/>
+                                </Offset>
+                            </Anchor>
+                        </Anchors>
+<!--                        <NormalTexture file="Interface\Buttons\UI-Silver-Button-Up"/>-->
+                        <HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+<!--                        <PushedTexture file="Interface\Buttons\UI-Silver-Button-Down"/>-->
+                        <NormalFont style="GameFontNormalSmall"/>
+                        <HighlightFont style="GameFontHighlightSmall"/>
+                        <Scripts>
+                            <OnClick>
+                                GuildManager:SortMembers("officernote")
+                                GuildManager:UpdateHeaderButtons()
+                            </OnClick>
+                        </Scripts>
+                    </Button>
+                </Frames>
+            </Frame>
+
+            <!-- Scroll Frame for Member List -->
+            <ScrollFrame name="GuildManagerScrollFrame" inherits="FauxScrollFrameTemplate">
+                <Size>
+                    <AbsDimension x="740" y="340"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="TOPLEFT">
+                        <Offset>
+                            <AbsDimension x="20" y="-115"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnVerticalScroll>
+                        FauxScrollFrame_OnVerticalScroll(self, offset, 20, function() GuildManager:SortAndFilterMembers() end)
+                    </OnVerticalScroll>
+                </Scripts>
+            </ScrollFrame>
+        </Frames>
+
+        <Scripts>
+            <OnLoad>
+                GuildManagerFrameTitle:SetText("Guild Manager")
+                GuildManager:OnLoad(self)
+            </OnLoad>
+            <OnEvent>
+                GuildManager:OnEvent(event, ...)
+            </OnEvent>
+            <OnShow>
+                GuildManager:RequestGuildRoster()
+            </OnShow>
+            <OnMouseDown>
+                self:StartMoving()
+            </OnMouseDown>
+            <OnMouseUp>
+                self:StopMovingOrSizing()
+            </OnMouseUp>
+        </Scripts>
+    </Frame>
+
+    <!-- Virtual Template for Member Entry Rows -->
+    <Button name="GuildManagerEntryTemplate" virtual="true" enableMouse="true">
+        <Size>
+            <AbsDimension x="740" y="20"/>
+        </Size>
+        <NormalTexture file="Interface\Buttons\UI-Listbox-Highlight2">
+            <Color r="0.3" g="0.3" b="0.8" a="0"/>
+        </NormalTexture>
+        <HighlightTexture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD"/>
+        <Layers>
+            <Layer level="BACKGROUND">
+                <Texture name="$parentBG">
+                    <Anchors>
+                        <Anchor point="TOPLEFT"/>
+                        <Anchor point="BOTTOMRIGHT"/>
+                    </Anchors>
+                    <Color r="0.1" g="0.1" b="0.1" a="0.3"/>
+                </Texture>
+            </Layer>
+            <Layer level="ARTWORK">
+                <FontString name="$parentName" inherits="GameFontNormalSmall" justifyH="LEFT" nonspacewrap="true" maxLines="1">
+                    <Size>
+                        <AbsDimension x="145" y="20"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="LEFT">
+                            <Offset>
+                                <AbsDimension x="5" y="0"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </FontString>
+                <FontString name="$parentLevel" inherits="GameFontNormalSmall" justifyH="CENTER" nonspacewrap="true" maxLines="1">
+                    <Size>
+                        <AbsDimension x="45" y="20"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="LEFT" relativeTo="$parentName" relativePoint="RIGHT">
+                            <Offset>
+                                <AbsDimension x="5" y="0"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </FontString>
+                <FontString name="$parentRank" inherits="GameFontNormalSmall" justifyH="LEFT" nonspacewrap="true" maxLines="1">
+                    <Size>
+                        <AbsDimension x="115" y="20"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="LEFT" relativeTo="$parentLevel" relativePoint="RIGHT">
+                            <Offset>
+                                <AbsDimension x="5" y="0"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </FontString>
+                <FontString name="$parentNote" inherits="GameFontNormalSmall" justifyH="LEFT" nonspacewrap="true" maxLines="1">
+                    <Size>
+                        <AbsDimension x="195" y="20"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="LEFT" relativeTo="$parentRank" relativePoint="RIGHT">
+                            <Offset>
+                                <AbsDimension x="5" y="0"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </FontString>
+                <FontString name="$parentOfficerNote" inherits="GameFontNormalSmall" justifyH="LEFT" nonspacewrap="true" maxLines="1">
+                    <Size>
+                        <AbsDimension x="195" y="20"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="LEFT" relativeTo="$parentNote" relativePoint="RIGHT">
+                            <Offset>
+                                <AbsDimension x="5" y="0"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </FontString>
+            </Layer>
+        </Layers>
+        <Scripts>
+            <OnLoad>
+                self.nameText = _G[self:GetName().."Name"]
+                self.levelText = _G[self:GetName().."Level"]
+                self.rankText = _G[self:GetName().."Rank"]
+                self.noteText = _G[self:GetName().."Note"]
+                self.officerNoteText = _G[self:GetName().."OfficerNote"]
+            </OnLoad>
+            <OnClick>
+                GuildManager:OnEntryClick(self)
+            </OnClick>
+            <OnEnter>
+                self:GetNormalTexture():SetAlpha(0.3)
+            </OnEnter>
+            <OnLeave>
+                self:GetNormalTexture():SetAlpha(0)
+            </OnLeave>
+        </Scripts>
+    </Button>
+
+    <!-- Member Entry Row Instances -->
+    <Button name="GuildManagerEntry1" parent="GuildManagerScrollFrame" inherits="GuildManagerEntryTemplate">
+        <Anchors>
+            <Anchor point="TOPLEFT">
+                <Offset>
+                    <AbsDimension x="0" y="0"/>
+                </Offset>
+            </Anchor>
+        </Anchors>
+    </Button>
+    <Button name="GuildManagerEntry2" parent="GuildManagerScrollFrame" inherits="GuildManagerEntryTemplate">
+        <Anchors>
+            <Anchor point="TOPLEFT" relativeTo="GuildManagerEntry1" relativePoint="BOTTOMLEFT">
+                <Offset>
+                    <AbsDimension x="0" y="-2"/>
+                </Offset>
+            </Anchor>
+        </Anchors>
+    </Button>
+    <Button name="GuildManagerEntry3" parent="GuildManagerScrollFrame" inherits="GuildManagerEntryTemplate">
+        <Anchors>
+            <Anchor point="TOPLEFT" relativeTo="GuildManagerEntry2" relativePoint="BOTTOMLEFT">
+                <Offset>
+                    <AbsDimension x="0" y="-2"/>
+                </Offset>
+            </Anchor>
+        </Anchors>
+    </Button>
+    <Button name="GuildManagerEntry4" parent="GuildManagerScrollFrame" inherits="GuildManagerEntryTemplate">
+        <Anchors>
+            <Anchor point="TOPLEFT" relativeTo="GuildManagerEntry3" relativePoint="BOTTOMLEFT">
+                <Offset>
+                    <AbsDimension x="0" y="-2"/>
+                </Offset>
+            </Anchor>
+        </Anchors>
+    </Button>
+    <Button name="GuildManagerEntry5" parent="GuildManagerScrollFrame" inherits="GuildManagerEntryTemplate">
+        <Anchors>
+            <Anchor point="TOPLEFT" relativeTo="GuildManagerEntry4" relativePoint="BOTTOMLEFT">
+                <Offset>
+                    <AbsDimension x="0" y="-2"/>
+                </Offset>
+            </Anchor>
+        </Anchors>
+    </Button>
+    <Button name="GuildManagerEntry6" parent="GuildManagerScrollFrame" inherits="GuildManagerEntryTemplate">
+        <Anchors>
+            <Anchor point="TOPLEFT" relativeTo="GuildManagerEntry5" relativePoint="BOTTOMLEFT">
+                <Offset>
+                    <AbsDimension x="0" y="-2"/>
+                </Offset>
+            </Anchor>
+        </Anchors>
+    </Button>
+    <Button name="GuildManagerEntry7" parent="GuildManagerScrollFrame" inherits="GuildManagerEntryTemplate">
+        <Anchors>
+            <Anchor point="TOPLEFT" relativeTo="GuildManagerEntry6" relativePoint="BOTTOMLEFT">
+                <Offset>
+                    <AbsDimension x="0" y="-2"/>
+                </Offset>
+            </Anchor>
+        </Anchors>
+    </Button>
+    <Button name="GuildManagerEntry8" parent="GuildManagerScrollFrame" inherits="GuildManagerEntryTemplate">
+        <Anchors>
+            <Anchor point="TOPLEFT" relativeTo="GuildManagerEntry7" relativePoint="BOTTOMLEFT">
+                <Offset>
+                    <AbsDimension x="0" y="-2"/>
+                </Offset>
+            </Anchor>
+        </Anchors>
+    </Button>
+    <Button name="GuildManagerEntry9" parent="GuildManagerScrollFrame" inherits="GuildManagerEntryTemplate">
+        <Anchors>
+            <Anchor point="TOPLEFT" relativeTo="GuildManagerEntry8" relativePoint="BOTTOMLEFT">
+                <Offset>
+                    <AbsDimension x="0" y="-2"/>
+                </Offset>
+            </Anchor>
+        </Anchors>
+    </Button>
+    <Button name="GuildManagerEntry10" parent="GuildManagerScrollFrame" inherits="GuildManagerEntryTemplate">
+        <Anchors>
+            <Anchor point="TOPLEFT" relativeTo="GuildManagerEntry9" relativePoint="BOTTOMLEFT">
+                <Offset>
+                    <AbsDimension x="0" y="-2"/>
+                </Offset>
+            </Anchor>
+        </Anchors>
+    </Button>
+    <Button name="GuildManagerEntry11" parent="GuildManagerScrollFrame" inherits="GuildManagerEntryTemplate">
+        <Anchors>
+            <Anchor point="TOPLEFT" relativeTo="GuildManagerEntry10" relativePoint="BOTTOMLEFT">
+                <Offset>
+                    <AbsDimension x="0" y="-2"/>
+                </Offset>
+            </Anchor>
+        </Anchors>
+    </Button>
+    <Button name="GuildManagerEntry12" parent="GuildManagerScrollFrame" inherits="GuildManagerEntryTemplate">
+        <Anchors>
+            <Anchor point="TOPLEFT" relativeTo="GuildManagerEntry11" relativePoint="BOTTOMLEFT">
+                <Offset>
+                    <AbsDimension x="0" y="-2"/>
+                </Offset>
+            </Anchor>
+        </Anchors>
+    </Button>
+    <Button name="GuildManagerEntry13" parent="GuildManagerScrollFrame" inherits="GuildManagerEntryTemplate">
+        <Anchors>
+            <Anchor point="TOPLEFT" relativeTo="GuildManagerEntry12" relativePoint="BOTTOMLEFT">
+                <Offset>
+                    <AbsDimension x="0" y="-2"/>
+                </Offset>
+            </Anchor>
+        </Anchors>
+    </Button>
+    <Button name="GuildManagerEntry14" parent="GuildManagerScrollFrame" inherits="GuildManagerEntryTemplate">
+        <Anchors>
+            <Anchor point="TOPLEFT" relativeTo="GuildManagerEntry13" relativePoint="BOTTOMLEFT">
+                <Offset>
+                    <AbsDimension x="0" y="-2"/>
+                </Offset>
+            </Anchor>
+        </Anchors>
+    </Button>
+    <Button name="GuildManagerEntry15" parent="GuildManagerScrollFrame" inherits="GuildManagerEntryTemplate">
+        <Anchors>
+            <Anchor point="TOPLEFT" relativeTo="GuildManagerEntry14" relativePoint="BOTTOMLEFT">
+                <Offset>
+                    <AbsDimension x="0" y="-2"/>
+                </Offset>
+            </Anchor>
+        </Anchors>
+    </Button>
+
+    <!-- Edit Member Dialog -->
+    <Frame name="GuildManagerEditDialog" parent="UIParent" enableMouse="true" movable="true" frameStrata="FULLSCREEN_DIALOG" hidden="true">
+        <Size>
+            <AbsDimension x="400" y="300"/>
+        </Size>
+        <Anchors>
+            <Anchor point="CENTER"/>
+        </Anchors>
+
+        <Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+            <BackgroundInsets>
+                <AbsInset left="11" right="12" top="12" bottom="11"/>
+            </BackgroundInsets>
+            <TileSize>
+                <AbsValue val="32"/>
+            </TileSize>
+            <EdgeSize>
+                <AbsValue val="32"/>
+            </EdgeSize>
+        </Backdrop>
+
+        <Layers>
+            <Layer level="ARTWORK">
+                <FontString name="$parentTitle" inherits="GameFontNormal">
+                    <Anchors>
+                        <Anchor point="TOP">
+                            <Offset>
+                                <AbsDimension x="0" y="-15"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                    <Text>Edit Member</Text>
+                </FontString>
+
+                <FontString name="$parentNameLabel" inherits="GameFontNormal" text="Name:">
+                    <Anchors>
+                        <Anchor point="TOPLEFT">
+                            <Offset>
+                                <AbsDimension x="20" y="-50"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </FontString>
+
+                <FontString name="$parentNameValue" inherits="GameFontHighlight">
+                    <Anchors>
+                        <Anchor point="LEFT" relativeTo="$parentNameLabel" relativePoint="RIGHT">
+                            <Offset>
+                                <AbsDimension x="10" y="0"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </FontString>
+
+                <FontString name="$parentRankLabel" inherits="GameFontNormal" text="Rank:">
+                    <Anchors>
+                        <Anchor point="TOPLEFT">
+                            <Offset>
+                                <AbsDimension x="20" y="-75"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </FontString>
+
+                <FontString name="$parentRankValue" inherits="GameFontHighlight">
+                    <Anchors>
+                        <Anchor point="LEFT" relativeTo="$parentRankLabel" relativePoint="RIGHT">
+                            <Offset>
+                                <AbsDimension x="10" y="0"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </FontString>
+
+                <FontString name="$parentPublicNoteLabel" inherits="GameFontNormal" text="Public Note:">
+                    <Anchors>
+                        <Anchor point="TOPLEFT">
+                            <Offset>
+                                <AbsDimension x="20" y="-105"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </FontString>
+
+                <FontString name="$parentOfficerNoteLabel" inherits="GameFontNormal" text="Officer Note:">
+                    <Anchors>
+                        <Anchor point="TOPLEFT">
+                            <Offset>
+                                <AbsDimension x="20" y="-180"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </FontString>
+            </Layer>
+        </Layers>
+
+        <Frames>
+            <!-- Close Button -->
+            <Button name="$parentCloseButton" inherits="UIPanelCloseButton">
+                <Anchors>
+                    <Anchor point="TOPRIGHT">
+                        <Offset>
+                            <AbsDimension x="-5" y="-5"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+            </Button>
+
+            <!-- Public Note Edit Box -->
+            <ScrollFrame name="$parentPublicNoteScroll" inherits="UIPanelScrollFrameTemplate">
+                <Size>
+                    <AbsDimension x="340" y="60"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="TOPLEFT">
+                        <Offset>
+                            <AbsDimension x="20" y="-120"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+
+                <Backdrop bgFile="Interface\ChatFrame\ChatFrameBackground" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+                    <EdgeSize>
+                        <AbsValue val="16"/>
+                    </EdgeSize>
+                    <TileSize>
+                        <AbsValue val="16"/>
+                    </TileSize>
+                    <BackgroundInsets>
+                        <AbsInset left="8" right="8" top="8" bottom="8"/>
+                    </BackgroundInsets>
+                    <Color r="0" g="0" b="0" a="0.5"/>
+                </Backdrop>
+                <ScrollChild>
+                    <EditBox name="$parentEdit" autoFocus="false" multiline="true">
+                        <TextInsets>
+                            <AbsInset left="6" right="6" top="6" bottom="6"/>
+                        </TextInsets>
+                        <Size>
+                            <AbsDimension x="340" y="60"/>
+                        </Size>
+                        <FontString inherits="ChatFontNormal"/>
+                        <Scripts>
+                            <OnEscapePressed>
+                                self:ClearFocus()
+                            </OnEscapePressed>
+                            <OnCursorChanged>
+                                ScrollingEdit_OnCursorChanged(self, x, y, w, h)
+                            </OnCursorChanged>
+                            <OnUpdate>
+                                ScrollingEdit_OnUpdate(self, elapsed, self:GetParent())
+                            </OnUpdate>
+                            <OnTextChanged>
+                                ScrollingEdit_OnTextChanged(self, self:GetParent())
+                            </OnTextChanged>
+                        </Scripts>
+                    </EditBox>
+                </ScrollChild>
+            </ScrollFrame>
+
+            <!-- Officer Note Edit Box -->
+            <ScrollFrame name="$parentOfficerNoteScroll" inherits="UIPanelScrollFrameTemplate">
+                <Size>
+                    <AbsDimension x="340" y="60"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="TOPLEFT">
+                        <Offset>
+                            <AbsDimension x="20" y="-200"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Backdrop bgFile="Interface\ChatFrame\ChatFrameBackground" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+                    <EdgeSize>
+                        <AbsValue val="16"/>
+                    </EdgeSize>
+                    <TileSize>
+                        <AbsValue val="16"/>
+                    </TileSize>
+                    <BackgroundInsets>
+                        <AbsInset left="8" right="8" top="8" bottom="8"/>
+                    </BackgroundInsets>
+                    <Color r="0" g="0" b="0" a="0.5"/>
+                </Backdrop>
+                <ScrollChild>
+                    <EditBox name="$parentEdit" autoFocus="false" multiline="true">
+                        <Size>
+                            <AbsDimension x="340" y="60"/>
+                        </Size>
+                        <TextInsets>
+                            <AbsInset left="6" right="6" top="6" bottom="6"/>
+                        </TextInsets>
+                        <FontString inherits="ChatFontNormal"/>
+                        <Scripts>
+                            <OnEscapePressed>
+                                self:ClearFocus()
+                            </OnEscapePressed>
+                            <OnCursorChanged>
+                                ScrollingEdit_OnCursorChanged(self, x, y, w, h)
+                            </OnCursorChanged>
+                            <OnUpdate>
+                                ScrollingEdit_OnUpdate(self, elapsed, self:GetParent())
+                            </OnUpdate>
+                            <OnTextChanged>
+                                ScrollingEdit_OnTextChanged(self, self:GetParent())
+                            </OnTextChanged>
+                        </Scripts>
+                    </EditBox>
+                </ScrollChild>
+            </ScrollFrame>
+
+            <!-- Save Button -->
+            <Button name="$parentSaveButton" inherits="UIPanelButtonTemplate" text="Save">
+                <Size>
+                    <AbsDimension x="100" y="25"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="BOTTOM">
+                        <Offset>
+                            <AbsDimension x="-55" y="15"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnClick>
+                        GuildManager:SaveMemberEdit()
+                    </OnClick>
+                </Scripts>
+            </Button>
+
+            <!-- Cancel Button -->
+            <Button name="$parentCancelButton" inherits="UIPanelButtonTemplate" text="Cancel">
+                <Size>
+                    <AbsDimension x="100" y="25"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="BOTTOM">
+                        <Offset>
+                            <AbsDimension x="55" y="15"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnClick>
+                        GuildManagerEditDialog:Hide()
+                    </OnClick>
+                </Scripts>
+            </Button>
+        </Frames>
+
+        <Scripts>
+            <OnLoad>
+                GuildManagerEditDialogTitle:SetText("Edit Guild Member")
+            </OnLoad>
+            <OnMouseDown>
+                self:StartMoving()
+            </OnMouseDown>
+            <OnMouseUp>
+                self:StopMovingOrSizing()
+            </OnMouseUp>
+        </Scripts>
+    </Frame>
+
+</Ui>
+
