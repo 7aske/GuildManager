@@ -15,6 +15,7 @@ local searchText = ""
 local selectedMember = nil
 local showOfflineMembers = true
 local myRankIndex = nil
+local guildName = nil
 
 -- Initialize the addon
 function GuildManager:OnLoad(frame)
@@ -31,7 +32,7 @@ function GuildManager:OnLoad(frame)
 
     -- Initialize showOfflineMembers from the game's current setting
     showOfflineMembers = GetGuildRosterShowOffline()
-    myRankIndex = select(3, GetGuildInfo("player"))
+    guildName, _, myRankIndex = GetGuildInfo("player")
 
     DEFAULT_CHAT_FRAME:AddMessage("|cFF00FF00Guild Manager|r v" .. self.version .. " loaded. Type /gman to open.")
 end
@@ -173,8 +174,6 @@ function GuildManager:UpdateScrollFrame(members)
         return
     end
 
---     DEFAULT_CHAT_FRAME:AddMessage("Guild Manager: UpdateScrollFrame called with " .. #members .. " members")
-
     local scrollFrame = GuildManagerScrollFrame
     if not scrollFrame then
         DEFAULT_CHAT_FRAME:AddMessage("Guild Manager ERROR: GuildManagerScrollFrame not found!")
@@ -207,8 +206,6 @@ function GuildManager:UpdateScrollFrame(members)
 
             if index <= #members then
                 local member = members[index]
-
---                 DEFAULT_CHAT_FRAME:AddMessage("Setting button " .. index .. " to member: " .. member.name)
 
                 -- Store the member data on the button for later access
                 button.memberData = member
@@ -261,16 +258,12 @@ function GuildManager:UpdateScrollFrame(members)
                 end
 
                 button:Show()
---                 DEFAULT_CHAT_FRAME:AddMessage("Showing button " .. index .. " for member: " .. member.name)
             else
                 button.memberData = nil
                 button:Hide()
---                 DEFAULT_CHAT_FRAME:AddMessage("Hiding button " .. i .. " (no member)")
             end
         end
     end
-
---     DEFAULT_CHAT_FRAME:AddMessage("Guild Manager: UpdateScrollFrame completed")
 end
 
 -- Toggle the main frame
@@ -284,6 +277,7 @@ function GuildManager:ToggleFrame()
         GuildManagerFrame:Hide()
     else
         GuildManagerFrame:Show()
+        GuildManagerFrameTitle:SetText("Guild Manager - " .. (guildName or "N/A"))
 
         -- Sync the checkbox with the game's current setting
         showOfflineMembers = GetGuildRosterShowOffline()
@@ -302,7 +296,6 @@ end
 -- Search function
 function GuildManager:SetSearchText(text)
     searchText = text or ""
---     DEFAULT_CHAT_FRAME:AddMessage("Guild Manager: Searching for '" .. searchText .. "'")
     FauxScrollFrame_SetOffset(GuildManagerScrollFrame, 0)
     self:SortAndFilterMembers()
 end
