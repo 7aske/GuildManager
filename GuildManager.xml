@@ -6,7 +6,11 @@
             <AbsDimension x="800" y="500"/>
         </Size>
         <Anchors>
-            <Anchor point="CENTER"/>
+            <Anchor point="TOPLEFT" relativeTo="UIParent" relativePoint="TOPLEFT">
+                <Offset>
+                    <AbsDimension x="0" y="-100"/>
+                </Offset>
+            </Anchor>
         </Anchors>
 
         <Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
@@ -28,6 +32,15 @@
                         <Anchor point="TOP" relativePoint="TOP">
                             <Offset>
                                 <AbsDimension x="0" y="-15"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </FontString>
+                <FontString name="$parentMemberCount" inherits="GameFontNormal" text="Test">
+                    <Anchors>
+                        <Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT">
+                            <Offset>
+                                <AbsDimension x="20" y="20"/>
                             </Offset>
                         </Anchor>
                     </Anchors>
@@ -137,7 +150,7 @@
                 </Anchors>
                 <Scripts>
                     <OnLoad>
-                        _G[self:GetName().."Text"]:SetText("Show Offline")
+                        _G[self:GetName().."Text"]:SetText("Show Offline Members")
                     </OnLoad>
                     <OnClick>
                         GuildManager:ToggleShowOffline(self:GetChecked())
@@ -281,6 +294,7 @@
                 </Frames>
             </Frame>
 
+
             <!-- Scroll Frame for Member List -->
             <ScrollFrame name="GuildManagerScrollFrame" inherits="FauxScrollFrameTemplate">
                 <Size>
@@ -300,6 +314,7 @@
                 </Scripts>
             </ScrollFrame>
         </Frames>
+
 
         <Scripts>
             <OnLoad>
@@ -581,10 +596,14 @@
     <!-- Edit Member Dialog -->
     <Frame name="GuildManagerEditDialog" parent="UIParent" enableMouse="true" movable="true" frameStrata="FULLSCREEN_DIALOG" hidden="true">
         <Size>
-            <AbsDimension x="400" y="360"/>
+            <AbsDimension x="300" y="360"/>
         </Size>
         <Anchors>
-            <Anchor point="CENTER"/>
+            <Anchor relativeTo="GuildManagerFrame" point="TOPRIGHT" relativePoint="TOPRIGHT">
+                <Offset>
+                    <AbsDimension x="400" y="0"/>
+                </Offset>
+            </Anchor>
         </Anchors>
 
         <Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
@@ -695,9 +714,9 @@
                     <AbsDimension x="24" y="20"/>
                 </Size>
                 <Anchors>
-                    <Anchor point="LEFT" relativeTo="$parentRankValue" relativePoint="RIGHT">
+                    <Anchor point="LEFT" relativeTo="$parentRankLabel" relativePoint="RIGHT">
                         <Offset>
-                            <AbsDimension x="60" y="8"/>
+                            <AbsDimension x="140" y="8"/>
                         </Offset>
                     </Anchor>
                 </Anchors>
@@ -732,7 +751,7 @@
             <!-- Public Note Edit Box -->
             <ScrollFrame name="$parentPublicNoteScroll" inherits="UIPanelScrollFrameTemplate">
                 <Size>
-                    <AbsDimension x="340" y="60"/>
+                    <AbsDimension x="240" y="60"/>
                 </Size>
                 <Anchors>
                     <Anchor point="TOPLEFT">
@@ -760,7 +779,7 @@
                             <AbsInset left="6" right="6" top="6" bottom="6"/>
                         </TextInsets>
                         <Size>
-                            <AbsDimension x="340" y="60"/>
+                            <AbsDimension x="240" y="60"/>
                         </Size>
                         <FontString inherits="ChatFontNormal"/>
                         <Scripts>
@@ -784,7 +803,7 @@
             <!-- Officer Note Edit Box -->
             <ScrollFrame name="$parentOfficerNoteScroll" inherits="UIPanelScrollFrameTemplate">
                 <Size>
-                    <AbsDimension x="340" y="60"/>
+                    <AbsDimension x="240" y="60"/>
                 </Size>
                 <Anchors>
                     <Anchor point="TOPLEFT">
@@ -808,7 +827,7 @@
                 <ScrollChild>
                     <EditBox name="$parentEdit" autoFocus="false" multiline="true">
                         <Size>
-                            <AbsDimension x="340" y="60"/>
+                            <AbsDimension x="240" y="60"/>
                         </Size>
                         <TextInsets>
                             <AbsInset left="6" right="6" top="6" bottom="6"/>
@@ -871,18 +890,21 @@
             </Button>
 
             <!-- Guild Remove Button -->
-            <Button name="$parentRemoveButton" inherits="UIPanelButtonTemplate" text="Remove from Guild">
+            <Button name="$parentRemoveButton" inherits="UIPanelButtonTemplate" text="Remove">
                 <Size>
-                    <AbsDimension x="140" y="25"/>
+                    <AbsDimension x="100" y="25"/>
                 </Size>
                 <Anchors>
                     <Anchor point="BOTTOM">
                         <Offset>
-                            <AbsDimension x="-75" y="20"/>
+                            <AbsDimension x="-55" y="20"/>
                         </Offset>
                     </Anchor>
                 </Anchors>
                 <Scripts>
+                    <OnLoad>
+                        self:GetFontString():SetTextColor(1.0, 0.0, 0.0, 1)
+                    </OnLoad>
                     <OnClick>
                         GuildManager:RemoveMemberFromGuild()
                     </OnClick>
@@ -890,14 +912,14 @@
             </Button>
 
             <!-- Group Invite Button -->
-            <Button name="$parentInviteButton" inherits="UIPanelButtonTemplate" text="Invite to Group">
+            <Button name="$parentInviteButton" inherits="UIPanelButtonTemplate" text="Invite">
                 <Size>
-                    <AbsDimension x="140" y="25"/>
+                    <AbsDimension x="100" y="25"/>
                 </Size>
                 <Anchors>
                     <Anchor point="BOTTOM">
                         <Offset>
-                            <AbsDimension x="75" y="20"/>
+                            <AbsDimension x="55" y="20"/>
                         </Offset>
                     </Anchor>
                 </Anchors>
@@ -910,12 +932,6 @@
         </Frames>
 
         <Scripts>
-            <OnLoad>
-<!--                GuildManagerEditDialogTitle:SetText("Edit Guild Member")-->
-                if not GuildManager:IsSelectedMemberOnline() then
-                    GuildManagerEditDialogInviteButton:Disable()
-                end
-            </OnLoad>
             <OnMouseDown>
                 self:StartMoving()
             </OnMouseDown>

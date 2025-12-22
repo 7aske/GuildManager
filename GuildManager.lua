@@ -14,6 +14,7 @@ local currentSort = {
 local searchText = ""
 local selectedMember = nil
 local showOfflineMembers = true
+local myRankIndex = nil
 
 -- Initialize the addon
 function GuildManager:OnLoad(frame)
@@ -30,6 +31,7 @@ function GuildManager:OnLoad(frame)
 
     -- Initialize showOfflineMembers from the game's current setting
     showOfflineMembers = GetGuildRosterShowOffline()
+    myRankIndex = select(3, GetGuildInfo("player"))
 
     DEFAULT_CHAT_FRAME:AddMessage("|cFF00FF00Guild Manager|r v" .. self.version .. " loaded. Type /gman to open.")
 end
@@ -98,6 +100,8 @@ function GuildManager:UpdateGuildRoster()
             end
         end
     end
+
+    GuildManagerFrameMemberCount:SetText("Members: "..#guildMembers)
 end
 
 -- Sort members by column
@@ -398,7 +402,7 @@ function GuildManager:ShowEditDialog(member)
         local demoteBtn = GuildManagerEditDialogDemoteButton
 
         if promoteBtn then
-            if member and member.rankIndex and member.rankIndex > 0 then
+            if member and member.rankIndex and member.rankIndex > 0 and myRankIndex < member.rankIndex - 1 then
                 promoteBtn:Enable()
             else
                 promoteBtn:Disable()
@@ -414,8 +418,25 @@ function GuildManager:ShowEditDialog(member)
         end
     end
 
+    local canRemove, _ = HasPermission(member.name)
+    if not canRemove then
+        GuildManagerEditDialogRemoveButton:Disable()
+    else
+        GuildManagerEditDialogRemoveButton:Enable()
+    end
+
+    -- Update Invite button enabled state
+    if not member.online or member.name == UnitName("player") then
+        GuildManagerEditDialogInviteButton:Disable()
+    else
+        GuildManagerEditDialogInviteButton:Enable()
+    end
+
     -- Show the dialog
     GuildManagerEditDialog:Show()
+    GuildManagerEditDialog:ClearAllPoints()
+    GuildManagerEditDialog:SetPoint("TOPLEFT", GuildManagerFrame, "TOPRIGHT", "0", "0")
+    GuildManagerEditDialog:SetUserPlaced(false)
 end
 
 -- Promote selected member (calls Blizzard API)
@@ -568,7 +589,44 @@ function GuildManager:InviteMemberToGroup()
     InviteUnit(selectedMember.name)
 end
 
-function GuildManager:IsSelectedMemberOnline()
-    if not selectedMember then return false end
-    return selectedMember.online
+function HasPermission(targetName)
+    if not IsInGuild() then
+        return false, "Not in a guild."
+    end
+
+    -- Get the target's rank index
+    local targetRankIndex
+    for i = 1, GetNumGuildMembers() do
+        local name, _, rankIndex = GetGuildRosterInfo(i)
+        if name == targetName then
+            targetRankIndex = rankIndex
+            break
+        end
+    end
+
+    if targetRankIndex == nil then
+        return false, "Target not found in roster or offline."
+    end
+
+    -- Guild Master (rank 0) can always remove members
+    if myRankIndex == 0 then
+        return true, "Guild Master."
+    end
+
+    -- Check if player has the 'remove' flag for their rank
+    -- The specific flag index/name may change with API updates.
+    -- Historically, flag 12 or a similar index was "can remove players".
+    -- You need to inspect the table returned by C_GuildInfo.GuildControlGetRankFlags(myRankIndex)
+    -- to find the correct key for 'remove' permission in the current API version.
+    -- Assuming a generic 'canRemove' flag exists in the returned table:
+    -- local rankFlags = C_GuildInfo.GuildControlGetRankFlags(myRankIndex)
+    -- local hasRemovePermission = rankFlags and rankFlags.canRemove
+
+    -- A more direct check is often comparing ranks. A higher rank index (lower rank) cannot kick a lower rank index (higher rank).
+    if myRankIndex < targetRankIndex then
+        -- This generally implies you have a higher rank and thus implicitly the permission (if the GM set it up this way)
+        return true, "Higher rank."
+    else
+        return false, "Insufficient rank."
+    end
 end
