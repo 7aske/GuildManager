@@ -2,6 +2,8 @@
 
 A comprehensive guild management addon for World of Warcraft 3.3.5a that provides an enhanced UI for managing guild members with advanced sorting and searching capabilities.
 
+![Guild Manager Screenshot](https://i.imgur.com/CU0kR75.png)
+
 ## Features
 
 - **Sortable Columns**: Click on any column header to sort by:
