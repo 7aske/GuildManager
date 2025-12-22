@@ -22,7 +22,7 @@ A comprehensive guild management addon for World of Warcraft 3.3.5a that provide
 - **Visual Indicators**:
   - Class-colored names
   - Online/Offline status (dimmed for offline members)
-  - Sort direction indicators (▲/▼)
+  - Sort direction indicators (^/v)
   - Scrollable member list
 
 - **Easy Access**: Simple slash commands to open the interface
@@ -30,17 +30,14 @@ A comprehensive guild management addon for World of Warcraft 3.3.5a that provide
 
 ## Installation
 
-1. Download or copy the addon files
-2. Navigate to your WoW installation directory
-3. Place the `GuildManager` folder in `World of Warcraft/Interface/AddOns/`
-4. The folder should contain:
-   - `GuildManager.toc`
-   - `GuildManager.lua`
-   - `GuildManager.xml`
-
-5. Start World of Warcraft
-6. At the character selection screen, click "AddOns" to verify it's loaded
-7. Log in to a character that is in a guild
+1. Click the "Code" button above and select "Download ZIP"
+2. Extract the ZIP file
+3. Rename the extracted folder to `GuildManager` (remove any `-master` or version suffix)
+4. Navigate to your WoW installation directory
+5. Place the `GuildManager` folder in `World of Warcraft/Interface/AddOns/`
+6. Start World of Warcraft
+7. At the character selection screen, click "AddOns" to verify it's loaded
+8. Log in to a character that is in a guild
 
 ## Usage
 
@@ -67,6 +64,10 @@ Click on any column header to sort by that column:
 ### Refreshing the List
 
 Click the "Refresh" button to manually update the guild roster from the server.
+
+### Toggling offline members
+
+Click the "Show Offline Members" button to toggle the visibility of offline guild members.
 
 ### Moving the Window
 
