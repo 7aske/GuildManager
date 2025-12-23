@@ -649,6 +649,82 @@ function GuildManager:InviteMemberToGroup()
     InviteUnit(selectedMember.name)
 end
 
+-- New: Show 'Add Member' dialog to invite a player to the guild
+function GuildManager:ShowAddMemberDialog()
+    -- Create a simple StaticPopup dialog for adding a member if it doesn't exist
+    if not StaticPopupDialogs["GUILDMANAGER_ADD_MEMBER"] then
+        StaticPopupDialogs["GUILDMANAGER_ADD_MEMBER"] = {
+            text = "Invite player to the guild:",
+            button1 = "Invite",
+            button2 = "Cancel",
+            hasEditBox = true,
+            maxLetters = 128,
+            OnAccept = function(self)
+                local name = self.editBox:GetText()
+                if name and name ~= "" then
+                    GuildManager:AddMember(name)
+                else
+                    DEFAULT_CHAT_FRAME:AddMessage("|cFFFF0000Guild Manager:|r No name entered.")
+                end
+            end,
+            OnShow = function(self)
+                self.editBox:SetText("")
+                self.editBox:ClearFocus()
+            end,
+            OnHide = function(self)
+                self.editBox:SetText("")
+            end,
+            timeout = 0,
+            whileDead = true,
+            hideOnEscape = true,
+            preferredIndex = 3,
+        }
+    end
+
+    StaticPopup_Show("GUILDMANAGER_ADD_MEMBER")
+end
+
+-- New: Add member (invite to guild) by name
+function GuildManager:AddMember(name)
+    if not name or name == "" then
+        DEFAULT_CHAT_FRAME:AddMessage("|cFFFF0000Guild Manager:|r Invalid name.")
+        return
+    end
+
+    if not IsInGuild() then
+        DEFAULT_CHAT_FRAME:AddMessage("|cFFFF0000Guild Manager:|r You are not in a guild.")
+        return
+    end
+
+    -- Trim whitespace
+    name = name:gsub("^%s+", ""):gsub("%s+$", "")
+
+    -- Basic validation: prevent inviting yourself
+    if name == UnitName("player") then
+        DEFAULT_CHAT_FRAME:AddMessage("|cFFFF0000Guild Manager:|r You cannot invite yourself.")
+        return
+    end
+
+    -- Attempt to invite using the Blizzard API. Different WoW versions expose different functions.
+    local ok, err = pcall(function()
+        if GuildInvite then
+            GuildInvite(name)
+        elseif GuildInviteByName then
+            GuildInviteByName(name)
+        elseif C_GuildInfo and C_GuildInfo.Invite then
+            C_GuildInfo.Invite(name)
+        else
+            error("No guild invite API available in this client version.")
+        end
+    end)
+
+    if not ok then
+        DEFAULT_CHAT_FRAME:AddMessage("|cFFFF0000Guild Manager:|r Failed to invite " .. name .. ": " .. tostring(err))
+    else
+        DEFAULT_CHAT_FRAME:AddMessage("|cFF00FF00Guild Manager:|r Invitation sent to " .. name)
+    end
+end
+
 function HasPermission(targetName)
     if not IsInGuild() then
         return false, "Not in a guild."

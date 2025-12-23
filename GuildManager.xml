@@ -158,6 +158,25 @@
                 </Scripts>
             </CheckButton>
 
+            <!-- Add Member Button -->
+            <Button name="$parentAddMemberButton" inherits="UIPanelButtonTemplate" text="Add Member">
+                <Size>
+                    <AbsDimension x="120" y="25"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="TOPRIGHT" relativeTo="$parent">
+                        <Offset>
+                            <AbsDimension x="-20" y="-45"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnClick>
+                        GuildManager:ShowAddMemberDialog()
+                    </OnClick>
+                </Scripts>
+            </Button>
+
             <!-- Column Headers Frame -->
             <Frame name="$parentHeaderFrame">
                 <Size>
