@@ -103,6 +103,16 @@ function GuildManager:UpdateGuildRoster()
 
     self:SortAndFilterMembers()
 
+    -- If edit dialog is open, refresh it with the latest data for the selected member
+    if GuildManagerEditDialog and GuildManagerEditDialog:IsShown() and selectedMember and selectedMember.name then
+        for _, m in ipairs(guildMembers) do
+            if m.name == selectedMember.name then
+                selectedMember = m
+                self:ShowEditDialog(selectedMember)
+                break
+            end
+        end
+    end
     GuildManagerFrameMemberCount:SetText("|cFFFFFFFF" .. numTotalMembers .. "|r" .. " Guild Members (|cFFFFFFFF" .. numOnlineMembers .. "|r |cFF00FF00Online|r)")
 end
 
@@ -423,11 +433,19 @@ function GuildManager:ShowEditDialog(member)
     local officerNoteEdit = GuildManagerEditDialogOfficerNoteScrollEdit
 
     if publicNoteEdit then
-        publicNoteEdit:SetText((member and member.note) or "")
+        local incomingText = (member and member.note) or ""
+        local existingText = publicNoteEdit:GetText()
+        if existingText == "" or not existingText == incomingText then
+            publicNoteEdit:SetText(incomingText)
+        end
     end
 
     if officerNoteEdit then
-        officerNoteEdit:SetText((member and member.officernote) or "")
+        local incomingText = (member and member.officernote) or ""
+        local existingText = officerNoteEdit:GetText()
+        if existingText == "" or not existingText == incomingText then
+            officerNoteEdit:SetText(incomingText)
+        end
     end
 
     -- Update Promote/Demote button enabled state
