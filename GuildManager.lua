@@ -284,8 +284,12 @@ function GuildManager:UpdateScrollFrame(members)
 
                 if member.online then
                     button.lastOnlineText:SetText(ColoredText(member.lastOnlineText, 1, 1, 1))
+                else
+                    if member.lastOnline > 7 * 24 * 60 then
+                        button.lastOnlineText:SetText(ColoredText(member.lastOnlineText, 0.8, 0.2, 0.2))
                     else
-                    button.lastOnlineText:SetText(ColoredText(member.lastOnlineText, 0.5, 0.5, 0.5))
+                        button.lastOnlineText:SetText(ColoredText(member.lastOnlineText, 0.5, 0.5, 0.5))
+                    end
                 end
 
 
