@@ -16,6 +16,7 @@ local selectedMember = nil
 local showOfflineMembers = true
 local myRankIndex = nil
 local guildName = nil
+local numDisplayed = 15
 
 -- Initialize the addon
 function GuildManager:OnLoad(frame)
@@ -64,9 +65,18 @@ function GuildManager:UpdateGuildRoster()
     end
 
     local numTotalMembers = GetNumGuildMembers()
+    local numOnlineMembers = 0
 
     for i = 1, numTotalMembers do
         local name, rank, rankIndex, level, class, zone, note, officernote, online, status, classFileName = GetGuildRosterInfo(i)
+        local yearsOffline, monthsOffline, daysOffline, hoursOffline = GetGuildRosterLastOnline(i)
+        if yearsOffline == nil then yearsOffline = 0 end
+        if monthsOffline == nil then monthsOffline = 0 end
+        if daysOffline == nil then daysOffline = 0 end
+        if hoursOffline == nil then hoursOffline = 0 end
+        if online then
+            numOnlineMembers = numOnlineMembers + 1
+        end
 
         if name then
             -- Remove server name if present
@@ -84,25 +94,34 @@ function GuildManager:UpdateGuildRoster()
                 note = note or "",
                 officernote = officernote or "",
                 online = online,
-                status = status or ""
+                status = status or "",
+                lastOnline = yearsOffline * 365 * 24 * 60 + monthsOffline * 30 * 24 * 60 + daysOffline * 24 * 60 + hoursOffline * 60,
+                lastOnlineText = self:FormatLastOnline(online, yearsOffline, monthsOffline, daysOffline, hoursOffline)
             })
         end
     end
 
     self:SortAndFilterMembers()
 
-    -- If edit dialog is open, refresh it with the latest data for the selected member
-    if GuildManagerEditDialog and GuildManagerEditDialog:IsShown() and selectedMember and selectedMember.name then
-        for _, m in ipairs(guildMembers) do
-            if m.name == selectedMember.name then
-                selectedMember = m
-                self:ShowEditDialog(selectedMember)
-                break
-            end
+    GuildManagerFrameMemberCount:SetText("|cFFFFFFFF" .. numTotalMembers .. "|r" .. " Guild Members (|cFFFFFFFF" .. numOnlineMembers .. "|r |cFF00FF00Online|r)")
+end
+
+function GuildManager:FormatLastOnline(online, yearsOffline, monthsOffline, daysOffline, hoursOffline)
+    if online then
+        return "Online"
+    else
+        if yearsOffline and yearsOffline > 0 then
+            return yearsOffline .. " year" .. (yearsOffline > 1 and "s" or "") .. " ago"
+        elseif monthsOffline and monthsOffline > 0 then
+            return monthsOffline .. " month" .. (monthsOffline > 1 and "s" or "") .. " ago"
+        elseif daysOffline and daysOffline > 0 then
+            return daysOffline .. " day" .. (daysOffline > 1 and "s" or "") .. " ago"
+        elseif hoursOffline and hoursOffline > 0 then
+            return hoursOffline .. " hour" .. (hoursOffline > 1 and "s" or "") .. " ago"
+        else
+            return "< an hour ago"
         end
     end
-
-    GuildManagerFrameMemberCount:SetText("Members: "..#guildMembers)
 end
 
 -- Sort members by column
@@ -153,6 +172,13 @@ function GuildManager:SortAndFilterMembers()
             aVal, bVal = a.level, b.level
         elseif column == "class" then
             aVal, bVal = a.class, b.class
+        elseif column == "lastonline" then
+            if a.online and not b.online then
+                return currentSort.ascending
+            elseif not a.online and b.online then
+                return not currentSort.ascending
+            end
+            aVal, bVal = a.lastOnline, b.lastOnline
         else
             aVal, bVal = a.name, b.name
         end
@@ -181,7 +207,6 @@ function GuildManager:UpdateScrollFrame(members)
     end
 
     local offset = FauxScrollFrame_GetOffset(scrollFrame)
-    local numDisplayed = 15
 
     FauxScrollFrame_Update(scrollFrame, math.max(numDisplayed + 1, #members), numDisplayed, 22)
 
@@ -202,6 +227,7 @@ function GuildManager:UpdateScrollFrame(members)
                 button.rankText = _G["GuildManagerEntry"..i.."Rank"]
                 button.noteText = _G["GuildManagerEntry"..i.."Note"]
                 button.officerNoteText = _G["GuildManagerEntry"..i.."OfficerNote"]
+                button.lastOnlineText = _G["GuildManagerEntry"..i.."LastOnline"]
             end
 
             if index <= #members then
@@ -211,51 +237,50 @@ function GuildManager:UpdateScrollFrame(members)
                 button.memberData = member
 
                 -- Set name with class color
-                local classColor = RAID_CLASS_COLORS[member.classFileName]
-                if classColor then
-                    -- Construct color string from RGB values (3.3.5a compatible)
-                    local colorStr = string.format("%02x%02x%02x", classColor.r * 255, classColor.g * 255, classColor.b * 255)
-                    button.nameText:SetText("|cff" .. colorStr .. member.name .. "|r")
-                else
-                    button.nameText:SetText(member.name)
-                end
+                button.nameText:SetText(ClassColoredText(member.name, member.classFileName))
 
                 -- Set level
-                button.levelText:SetText(member.level)
+                if member.level == MAX_PLAYER_LEVEL then
+                    button.levelText:SetText(member.level)
+                else
+                    button.levelText:SetText(ColoredText(member.level, 0.5, 0.5, 0.5))
+                end
 
                 -- Set class with class color
-                if classColor then
-                    local colorStr = string.format("%02x%02x%02x", classColor.r * 255, classColor.g * 255, classColor.b * 255)
-                    button.classText:SetText("|cff" .. colorStr .. member.class .. "|r")
-                else
-                    button.classText:SetText(member.class)
-                end
+                button.classText:SetText(ClassColoredText(member.class, member.classFileName))
 
                 -- Set rank (role)
                 button.rankText:SetText(member.rank)
 
                 -- Set public note
-                button.noteText:SetText(member.note)
+                if member.online then
+                    button.noteText:SetText(ColoredText(member.note, 1, 1, 1))
+                else
+                    button.noteText:SetText(ColoredText(member.note, 0.5, 0.5, 0.5))
+                end
 
                 -- Set officer note (only visible if you have permission)
-                button.officerNoteText:SetText(member.officernote)
-
-                -- Set online status indicator
                 if member.online then
-                    button.nameText:SetAlpha(1.0)
-                    button.levelText:SetAlpha(1.0)
-                    button.classText:SetAlpha(1.0)
-                    button.rankText:SetAlpha(1.0)
-                    button.noteText:SetAlpha(1.0)
-                    button.officerNoteText:SetAlpha(1.0)
+                    button.officerNoteText:SetText(ColoredText(member.officernote, 1, 1, 1))
                 else
-                    button.nameText:SetAlpha(0.5)
-                    button.levelText:SetAlpha(0.5)
-                    button.classText:SetAlpha(0.5)
-                    button.rankText:SetAlpha(0.5)
-                    button.noteText:SetAlpha(0.5)
-                    button.officerNoteText:SetAlpha(0.5)
+                    button.officerNoteText:SetText(ColoredText(member.officernote, 0.5, 0.5, 0.5))
                 end
+
+                if member.online then
+                    button.lastOnlineText:SetText(ColoredText(member.lastOnlineText, 1, 1, 1))
+                    else
+                    button.lastOnlineText:SetText(ColoredText(member.lastOnlineText, 0.5, 0.5, 0.5))
+                end
+
+
+                local alpha = member.online and 1.0 or 0.5
+                button.nameText:SetAlpha(alpha)
+                button.levelText:SetAlpha(alpha)
+                button.classText:SetAlpha(alpha)
+                button.rankText:SetAlpha(alpha)
+                button.noteText:SetAlpha(alpha)
+                button.officerNoteText:SetAlpha(alpha)
+                button.lastOnlineText:SetAlpha(alpha)
 
                 button:Show()
             else
@@ -324,7 +349,8 @@ function GuildManager:UpdateHeaderButtons()
         {name = "Class", column = "class", button = GuildManagerFrameHeaderFrameClassHeader},
         {name = "Rank", column = "rank", button = GuildManagerFrameHeaderFrameRankHeader},
         {name = "Note", column = "note", button = GuildManagerFrameHeaderFrameNoteHeader},
-        {name = "Officer Note", column = "officernote", button = GuildManagerFrameHeaderFrameOfficerNoteHeader}
+        {name = "Officer's Note", column = "officernote", button = GuildManagerFrameHeaderFrameOfficerNoteHeader},
+        {name = "Last Online", column = "lastonline", button = GuildManagerFrameHeaderFrameLastOnlineHeader}
     }
 
     for _, header in ipairs(headers) do
@@ -622,4 +648,26 @@ function HasPermission(targetName)
     else
         return false, "Insufficient rank."
     end
+end
+
+function ClassColoredText(text, classFileName)
+    local classColor = RAID_CLASS_COLORS[classFileName]
+    if classColor then
+        local colorStr = string.format("%02x%02x%02x", classColor.r * 255, classColor.g * 255, classColor.b * 255)
+        return "|cff" .. colorStr .. text .. "|r"
+    else
+        return text
+    end
+end
+
+function ColoredText(text, r, g, b, a)
+    if not text then
+        return ""
+    end
+    if r == nil and g == nil and b == nil then
+        return text
+    end
+    if a == nil then a = 1.0 end
+    local colorStr = string.format("%02x%02x%02x%02x", a * 255, r * 255, g * 255, b * 255)
+    return "|c" .. colorStr .. text .. "|r"
 end

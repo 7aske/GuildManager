@@ -3,7 +3,7 @@
     <!-- Main Frame -->
     <Frame name="GuildManagerFrame" parent="UIParent" enableMouse="true" movable="true" frameStrata="MEDIUM" hidden="true">
         <Size>
-            <AbsDimension x="800" y="500"/>
+            <AbsDimension x="920" y="500"/>
         </Size>
         <Anchors>
             <Anchor point="TOPLEFT" relativeTo="UIParent" relativePoint="TOPLEFT">
@@ -291,6 +291,25 @@
                             </OnClick>
                         </Scripts>
                     </Button>
+
+                    <Button name="$parentLastOnlineHeader" text="Last Online" inherits="UIPanelButtonTemplate">
+                        <Size>
+                            <AbsDimension x="100" y="25"/>
+                        </Size>
+                        <Anchors>
+                            <Anchor point="LEFT" relativeTo="$parentOfficerNoteHeader" relativePoint="RIGHT">
+                                <Offset>
+                                    <AbsDimension x="0" y="0"/>
+                                </Offset>
+                            </Anchor>
+                        </Anchors>
+                        <Scripts>
+                            <OnClick>
+                                GuildManager:SortMembers("lastonline")
+                                GuildManager:UpdateHeaderButtons()
+                            </OnClick>
+                        </Scripts>
+                    </Button>
                 </Frames>
             </Frame>
 
@@ -298,7 +317,7 @@
             <!-- Scroll Frame for Member List -->
             <ScrollFrame name="GuildManagerScrollFrame" inherits="FauxScrollFrameTemplate">
                 <Size>
-                    <AbsDimension x="740" y="340"/>
+                    <AbsDimension x="860" y="340"/>
                 </Size>
                 <Anchors>
                     <Anchor point="TOPLEFT">
@@ -344,7 +363,7 @@
     <!-- Virtual Template for Member Entry Rows -->
     <Button name="GuildManagerEntryTemplate" virtual="true" enableMouse="true">
         <Size>
-            <AbsDimension x="740" y="20"/>
+            <AbsDimension x="860" y="20"/>
         </Size>
         <NormalTexture file="Interface\Buttons\UI-Listbox-Highlight2">
             <Color r="0.3" g="0.3" b="0.8" a="0"/>
@@ -387,7 +406,7 @@
                 </FontString>
                 <FontString name="$parentClass" inherits="GameFontNormalSmall" justifyH="LEFT" nonspacewrap="true" maxLines="1">
                     <Size>
-                        <AbsDimension x="75" y="20"/>
+                        <AbsDimension x="80" y="20"/>
                     </Size>
                     <Anchors>
                         <Anchor point="LEFT" relativeTo="$parentLevel" relativePoint="RIGHT">
@@ -404,7 +423,7 @@
                     <Anchors>
                         <Anchor point="LEFT" relativeTo="$parentClass" relativePoint="RIGHT">
                             <Offset>
-                                <AbsDimension x="5" y="0"/>
+                                <AbsDimension x="0" y="0"/>
                             </Offset>
                         </Anchor>
                     </Anchors>
@@ -416,7 +435,7 @@
                     <Anchors>
                         <Anchor point="LEFT" relativeTo="$parentRank" relativePoint="RIGHT">
                             <Offset>
-                                <AbsDimension x="5" y="0"/>
+                                <AbsDimension x="0" y="0"/>
                             </Offset>
                         </Anchor>
                     </Anchors>
@@ -428,7 +447,19 @@
                     <Anchors>
                         <Anchor point="LEFT" relativeTo="$parentNote" relativePoint="RIGHT">
                             <Offset>
-                                <AbsDimension x="5" y="0"/>
+                                <AbsDimension x="0" y="0"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </FontString>
+                <FontString name="$parentLastOnline" inherits="GameFontNormalSmall" justifyH="LEFT" nonspacewrap="true" maxLines="1">
+                    <Size>
+                        <AbsDimension x="100" y="20"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="LEFT" relativeTo="$parentOfficerNote" relativePoint="RIGHT">
+                            <Offset>
+                                <AbsDimension x="0" y="0"/>
                             </Offset>
                         </Anchor>
                     </Anchors>
@@ -443,6 +474,7 @@
                 self.rankText = _G[self:GetName().."Rank"]
                 self.noteText = _G[self:GetName().."Note"]
                 self.officerNoteText = _G[self:GetName().."OfficerNote"]
+                self.lastOnlineText = _G[self:GetName().."LastOnline"]
             </OnLoad>
             <OnClick>
                 GuildManager:OnEntryClick(self)
