@@ -434,18 +434,12 @@ function GuildManager:ShowEditDialog(member)
 
     if publicNoteEdit then
         local incomingText = (member and member.note) or ""
-        local existingText = publicNoteEdit:GetText()
-        if existingText == "" or not existingText == incomingText then
-            publicNoteEdit:SetText(incomingText)
-        end
+        publicNoteEdit:SetText(incomingText)
     end
 
     if officerNoteEdit then
         local incomingText = (member and member.officernote) or ""
-        local existingText = officerNoteEdit:GetText()
-        if existingText == "" or not existingText == incomingText then
-            officerNoteEdit:SetText(incomingText)
-        end
+        officerNoteEdit:SetText(incomingText)
     end
 
     -- Update Promote/Demote button enabled state
