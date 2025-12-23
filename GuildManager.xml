@@ -476,9 +476,9 @@
                 self.officerNoteText = _G[self:GetName().."OfficerNote"]
                 self.lastOnlineText = _G[self:GetName().."LastOnline"]
             </OnLoad>
-            <OnClick>
-                GuildManager:OnEntryClick(self)
-            </OnClick>
+<!--            <OnClick>-->
+<!--                GuildManager:OnEntryClick(self)-->
+<!--            </OnClick>-->
             <OnEnter>
                 self:GetNormalTexture():SetAlpha(0.3)
             </OnEnter>

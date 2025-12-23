@@ -12,10 +12,10 @@ local currentSort = {
     ascending = true
 }
 local searchText = ""
-local selectedMember = nil
+local selectedMember
 local showOfflineMembers = true
-local myRankIndex = nil
-local guildName = nil
+local myRankIndex
+local guildName
 local numDisplayed = 15
 
 -- Initialize the addon
@@ -27,7 +27,7 @@ function GuildManager:OnLoad(frame)
     -- Set up slash commands
     SLASH_GUILDMANAGER1 = "/gman"
     SLASH_GUILDMANAGER2 = "/guildmanager"
-    SlashCmdList["GUILDMANAGER"] = function(msg)
+    SlashCmdList["GUILDMANAGER"] = function()
         GuildManager:ToggleFrame()
     end
 
@@ -217,6 +217,12 @@ function GuildManager:UpdateScrollFrame(members)
         if not button then
             DEFAULT_CHAT_FRAME:AddMessage("Guild Manager ERROR: Button " .. i .. " not found!")
         else
+            -- Ensure button responds to left and right clicks and route to OnEntryClick
+            button:RegisterForClicks("AnyUp")
+            button:SetScript("OnMouseUp", function(self, mouseButton)
+                GuildManager:OnEntryClick(self, mouseButton)
+            end)
+
             -- Check if button's text elements are initialized
             if not button.nameText then
                 DEFAULT_CHAT_FRAME:AddMessage("Guild Manager ERROR: Button " .. i .. " nameText not initialized!")
@@ -360,14 +366,31 @@ function GuildManager:UpdateHeaderButtons()
     end
 end
 
--- Handle entry click
-function GuildManager:OnEntryClick(button)
-    if not button.memberData then
+-- Handle entry click (left-click preserves existing behavior; right-click opens standard Blizzard guild menu)
+function GuildManager:OnEntryClick(button, mouseButton)
+    if not button or not button.memberData then
         return
     end
 
+    -- Right-click: show Blizzard guild member context menu
+    if mouseButton == "RightButton" then
+        GuildManager:ShowGuildMemberMenu(button)
+        return
+    end
+
+    -- Left-click (default behavior)
     selectedMember = button.memberData
     self:ShowEditDialog(selectedMember)
+end
+
+-- Show the standard Blizzard guild member right-click menu for a given entry button
+function GuildManager:ShowGuildMemberMenu(button)
+    if not button or not button.memberData then return end
+    if not button.memberData.online then
+        return
+    end
+
+    FriendsFrame_ShowDropdown(button.memberData.name, true)
 end
 
 -- Show edit dialog
