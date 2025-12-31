@@ -17,6 +17,7 @@ local showOfflineMembers = true
 local myRankIndex
 local guildName
 local numDisplayed = 15
+local filterClass = nil -- nil means show all classes
 
 -- Class icon texcoords (3.3.5a)
 local CLASS_TEX = {
@@ -30,6 +31,20 @@ local CLASS_TEX = {
     WARLOCK     = {0.75, 1, 0.25, 0.5},
     PALADIN     = {0, 0.25, 0.5, 0.75},
     DEATHKNIGHT = {0.25, 0.5, 0.5, 0.75},
+}
+
+-- Class display names
+local CLASS_DISPLAY_NAMES = {
+    WARRIOR     = "Warrior",
+    MAGE        = "Mage",
+    ROGUE       = "Rogue",
+    DRUID       = "Druid",
+    HUNTER      = "Hunter",
+    SHAMAN      = "Shaman",
+    PRIEST      = "Priest",
+    WARLOCK     = "Warlock",
+    PALADIN     = "Paladin",
+    DEATHKNIGHT = "Death Knight",
 }
 
 -- Initialize the addon
@@ -153,29 +168,37 @@ function GuildManager:ClassCountRow_Update(classCounts)
     local ROW = GuildManagerFrame:GetName()
 
     local WIDGETS = {
-        WARRIOR     = { icon = _G[ROW.."WarriorIcon"],     count = _G[ROW.."WarriorCount"] },
-        PALADIN     = { icon = _G[ROW.."PaladinIcon"],     count = _G[ROW.."PaladinCount"] },
-        HUNTER      = { icon = _G[ROW.."HunterIcon"],      count = _G[ROW.."HunterCount"]  },
-        ROGUE       = { icon = _G[ROW.."RogueIcon"],       count = _G[ROW.."RogueCount"]  },
-        PRIEST      = { icon = _G[ROW.."PriestIcon"],      count = _G[ROW.."PriestCount"]  },
-        DEATHKNIGHT = { icon = _G[ROW.."DeathKnightIcon"], count = _G[ROW.."DeathKnightCount"] },
-        SHAMAN      = { icon = _G[ROW.."ShamanIcon"],      count = _G[ROW.."ShamanCount"] },
-        MAGE        = { icon = _G[ROW.."MageIcon"],        count = _G[ROW.."MageCount"] },
-        WARLOCK     = { icon = _G[ROW.."WarlockIcon"],     count = _G[ROW.."WarlockCount"] },
-        DRUID       = { icon = _G[ROW.."DruidIcon"],       count = _G[ROW.."DruidCount"] },
+        WARRIOR     = { button = _G[ROW.."WarriorButton"],     icon = _G[ROW.."WarriorButtonWarriorIcon"],     count = _G[ROW.."WarriorCount"] },
+        PALADIN     = { button = _G[ROW.."PaladinButton"],     icon = _G[ROW.."PaladinButtonPaladinIcon"],     count = _G[ROW.."PaladinCount"] },
+        HUNTER      = { button = _G[ROW.."HunterButton"],      icon = _G[ROW.."HunterButtonHunterIcon"],       count = _G[ROW.."HunterCount"]  },
+        ROGUE       = { button = _G[ROW.."RogueButton"],       icon = _G[ROW.."RogueButtonRogueIcon"],         count = _G[ROW.."RogueCount"]  },
+        PRIEST      = { button = _G[ROW.."PriestButton"],      icon = _G[ROW.."PriestButtonPriestIcon"],       count = _G[ROW.."PriestCount"]  },
+        DEATHKNIGHT = { button = _G[ROW.."DeathKnightButton"], icon = _G[ROW.."DeathKnightButtonDeathKnightIcon"], count = _G[ROW.."DeathKnightCount"] },
+        SHAMAN      = { button = _G[ROW.."ShamanButton"],      icon = _G[ROW.."ShamanButtonShamanIcon"],       count = _G[ROW.."ShamanCount"] },
+        MAGE        = { button = _G[ROW.."MageButton"],        icon = _G[ROW.."MageButtonMageIcon"],           count = _G[ROW.."MageCount"] },
+        WARLOCK     = { button = _G[ROW.."WarlockButton"],     icon = _G[ROW.."WarlockButtonWarlockIcon"],     count = _G[ROW.."WarlockCount"] },
+        DRUID       = { button = _G[ROW.."DruidButton"],       icon = _G[ROW.."DruidButtonDruidIcon"],         count = _G[ROW.."DruidCount"] },
     }
 
     for class, data in pairs(WIDGETS) do
         local count = classCounts[class] or 0
         data.count:SetText(count)
-        data.icon:SetTexCoord(unpack(CLASS_TEX[class]))
+        if data.icon then
+            data.icon:SetTexCoord(unpack(CLASS_TEX[class]))
+        end
 
-        if count == 0 then
-            data.icon:SetAlpha(0.25)
-            data.count:SetAlpha(0.25)
-        else
-            data.icon:SetAlpha(1)
-            data.count:SetAlpha(1)
+        local alpha = (count == 0) and 0.25 or 1.0
+        if data.icon then
+            data.icon:SetAlpha(alpha)
+        end
+        data.count:SetAlpha(alpha)
+        if data.button then
+            data.button:SetAlpha(alpha)
+            if count == 0 then
+                data.button:Disable()
+            else
+                data.button:Enable()
+            end
         end
     end
 end
@@ -213,18 +236,23 @@ end
 
 -- Apply sorting and filtering
 function GuildManager:SortAndFilterMembers()
-    -- Filter by search text
+    -- Filter by search text and class filter
     local filteredMembers = {}
     local search = string.lower(searchText)
 
     for _, member in ipairs(guildMembers) do
+        -- Filter by class if a class filter is active
+        local classMatch = (filterClass == nil or member.classFileName == filterClass)
+
         -- Filter by search text
-        if search == "" or
+        local searchMatch = (search == "" or
            string.find(string.lower(member.name), search, 1, true) or
            string.find(string.lower(member.note), search, 1, true) or
            string.find(string.lower(member.officernote), search, 1, true) or
            string.find(string.lower(member.rank), search, 1, true) or
-           string.find(string.lower(member.class), search, 1, true) then
+           string.find(string.lower(member.class), search, 1, true))
+
+        if classMatch and searchMatch then
             table.insert(filteredMembers, member)
         end
     end
@@ -265,6 +293,55 @@ function GuildManager:SortAndFilterMembers()
     end)
 
     self:UpdateScrollFrame(filteredMembers)
+end
+
+-- Filter by class
+function GuildManager:FilterByClass(className, button)
+    -- Toggle filter: if clicking the same class, clear filter; otherwise set new filter
+    if filterClass == className then
+        filterClass = nil
+        DEFAULT_CHAT_FRAME:AddMessage("|cFF00FF00Guild Manager:|r Showing all classes.")
+    else
+        filterClass = className
+        local classDisplayName = CLASS_DISPLAY_NAMES[className] or className
+        DEFAULT_CHAT_FRAME:AddMessage("|cFF00FF00Guild Manager:|r Filtering by " .. classDisplayName)
+    end
+
+    -- Reset scroll position and update
+    FauxScrollFrame_SetOffset(GuildManagerScrollFrame, 0)
+    self:SortAndFilterMembers()
+
+    -- Update button visual states
+    self:UpdateClassButtonStates()
+end
+
+-- Update visual states of class filter buttons
+function GuildManager:UpdateClassButtonStates()
+    local ROW = GuildManagerFrame:GetName()
+
+    local BUTTONS = {
+        WARRIOR     = _G[ROW.."WarriorButton"],
+        PALADIN     = _G[ROW.."PaladinButton"],
+        HUNTER      = _G[ROW.."HunterButton"],
+        ROGUE       = _G[ROW.."RogueButton"],
+        PRIEST      = _G[ROW.."PriestButton"],
+        DEATHKNIGHT = _G[ROW.."DeathKnightButton"],
+        SHAMAN      = _G[ROW.."ShamanButton"],
+        MAGE        = _G[ROW.."MageButton"],
+        WARLOCK     = _G[ROW.."WarlockButton"],
+        DRUID       = _G[ROW.."DruidButton"],
+    }
+
+    for class, btn in pairs(BUTTONS) do
+        if btn then
+            if filterClass == class then
+                -- Highlight selected class
+                btn:LockHighlight()
+            else
+                btn:UnlockHighlight()
+            end
+        end
+    end
 end
 
 -- Update the scroll frame with filtered/sorted members

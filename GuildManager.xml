@@ -59,99 +59,59 @@
                 </FontString>
 
                 <!-- WARRIOR -->
-                <Texture name="$parentWarriorIcon" file="Interface\GLUES\CHARACTERCREATE\UI-CHARACTERCREATE-CLASSES">
-                    <Size x="16" y="16"/>
+                <FontString name="$parentWarriorCount" inherits="GameFontHighlightSmall" text="0">
                     <Anchors>
                         <Anchor point="RIGHT" relativeTo="$parentMemberCount">
                             <Offset>
-                                <AbsDimension x="20"/>
+                                <AbsDimension x="34"/>
                             </Offset>
                         </Anchor>
                     </Anchors>
-                </Texture>
-                <FontString name="$parentWarriorCount" inherits="GameFontHighlightSmall" text="0" enableMouse="true">
-                    <Anchors><Anchor point="LEFT" relativeTo="$parentWarriorIcon" relativePoint="RIGHT" x="2"/></Anchors>
                 </FontString>
 
                 <!-- PALADIN -->
-                <Texture name="$parentPaladinIcon" file="Interface\GLUES\CHARACTERCREATE\UI-CHARACTERCREATE-CLASSES">
-                    <Size x="16" y="16"/>
-                    <Anchors><Anchor point="LEFT" relativeTo="$parentWarriorCount" relativePoint="RIGHT" x="8"/></Anchors>
-                </Texture>
                 <FontString name="$parentPaladinCount" inherits="GameFontHighlightSmall" text="0">
-                    <Anchors><Anchor point="LEFT" relativeTo="$parentPaladinIcon" relativePoint="RIGHT" x="2"/></Anchors>
+                    <Anchors><Anchor point="LEFT" relativeTo="$parentWarriorCount" x="48"/></Anchors>
                 </FontString>
 
                 <!-- HUNTER -->
-                <Texture name="$parentHunterIcon" file="Interface\GLUES\CHARACTERCREATE\UI-CHARACTERCREATE-CLASSES">
-                    <Size x="16" y="16"/>
-                    <Anchors><Anchor point="LEFT" relativeTo="$parentPaladinCount" relativePoint="RIGHT" x="8"/></Anchors>
-                </Texture>
                 <FontString name="$parentHunterCount" inherits="GameFontHighlightSmall" text="0">
-                    <Anchors><Anchor point="LEFT" relativeTo="$parentHunterIcon" relativePoint="RIGHT" x="2"/></Anchors>
+                    <Anchors><Anchor point="LEFT" relativeTo="$parentPaladinCount" x="48"/></Anchors>
                 </FontString>
 
                 <!-- ROGUE -->
-                <Texture name="$parentRogueIcon" file="Interface\GLUES\CHARACTERCREATE\UI-CHARACTERCREATE-CLASSES">
-                    <Size x="16" y="16"/>
-                    <Anchors><Anchor point="LEFT" relativeTo="$parentHunterCount" relativePoint="RIGHT" x="8"/></Anchors>
-                </Texture>
                 <FontString name="$parentRogueCount" inherits="GameFontHighlightSmall" text="0">
-                    <Anchors><Anchor point="LEFT" relativeTo="$parentRogueIcon" relativePoint="RIGHT" x="2"/></Anchors>
+                    <Anchors><Anchor point="LEFT" relativeTo="$parentHunterCount" x="48"/></Anchors>
                 </FontString>
 
                 <!-- PRIEST -->
-                <Texture name="$parentPriestIcon" file="Interface\GLUES\CHARACTERCREATE\UI-CHARACTERCREATE-CLASSES">
-                    <Size x="16" y="16"/>
-                    <Anchors><Anchor point="LEFT" relativeTo="$parentRogueCount" relativePoint="RIGHT" x="8"/></Anchors>
-                </Texture>
                 <FontString name="$parentPriestCount" inherits="GameFontHighlightSmall" text="0">
-                    <Anchors><Anchor point="LEFT" relativeTo="$parentPriestIcon" relativePoint="RIGHT" x="2"/></Anchors>
+                    <Anchors><Anchor point="LEFT" relativeTo="$parentRogueCount" x="48"/></Anchors>
                 </FontString>
 
                 <!-- DEATH KNIGHT -->
-                <Texture name="$parentDeathKnightIcon" file="Interface\GLUES\CHARACTERCREATE\UI-CHARACTERCREATE-CLASSES">
-                    <Size x="16" y="16"/>
-                    <Anchors><Anchor point="LEFT" relativeTo="$parentPriestCount" relativePoint="RIGHT" x="8"/></Anchors>
-                </Texture>
                 <FontString name="$parentDeathKnightCount" inherits="GameFontHighlightSmall" text="0">
-                    <Anchors><Anchor point="LEFT" relativeTo="$parentDeathKnightIcon" relativePoint="RIGHT" x="2"/></Anchors>
+                    <Anchors><Anchor point="LEFT" relativeTo="$parentPriestCount" x="48"/></Anchors>
                 </FontString>
 
                 <!-- SHAMAN -->
-                <Texture name="$parentShamanIcon" file="Interface\GLUES\CHARACTERCREATE\UI-CHARACTERCREATE-CLASSES">
-                    <Size x="16" y="16"/>
-                    <Anchors><Anchor point="LEFT" relativeTo="$parentDeathKnightCount" relativePoint="RIGHT" x="8"/></Anchors>
-                </Texture>
                 <FontString name="$parentShamanCount" inherits="GameFontHighlightSmall" text="0">
-                    <Anchors><Anchor point="LEFT" relativeTo="$parentShamanIcon" relativePoint="RIGHT" x="2"/></Anchors>
+                    <Anchors><Anchor point="LEFT" relativeTo="$parentDeathKnightCount" x="48"/></Anchors>
                 </FontString>
 
                 <!-- MAGE -->
-                <Texture name="$parentMageIcon" file="Interface\GLUES\CHARACTERCREATE\UI-CHARACTERCREATE-CLASSES">
-                    <Size x="16" y="16"/>
-                    <Anchors><Anchor point="LEFT" relativeTo="$parentShamanCount" relativePoint="RIGHT" x="8"/></Anchors>
-                </Texture>
                 <FontString name="$parentMageCount" inherits="GameFontHighlightSmall" text="0">
-                    <Anchors><Anchor point="LEFT" relativeTo="$parentMageIcon" relativePoint="RIGHT" x="2"/></Anchors>
+                    <Anchors><Anchor point="LEFT" relativeTo="$parentShamanCount" x="48"/></Anchors>
                 </FontString>
 
                 <!-- WARLOCK -->
-                <Texture name="$parentWarlockIcon" file="Interface\GLUES\CHARACTERCREATE\UI-CHARACTERCREATE-CLASSES">
-                    <Size x="16" y="16"/>
-                    <Anchors><Anchor point="LEFT" relativeTo="$parentMageCount" relativePoint="RIGHT" x="8"/></Anchors>
-                </Texture>
                 <FontString name="$parentWarlockCount" inherits="GameFontHighlightSmall" text="0">
-                    <Anchors><Anchor point="LEFT" relativeTo="$parentWarlockIcon" relativePoint="RIGHT" x="2"/></Anchors>
+                    <Anchors><Anchor point="LEFT" relativeTo="$parentMageCount" x="48"/></Anchors>
                 </FontString>
 
                 <!-- DRUID -->
-                <Texture name="$parentDruidIcon" file="Interface\GLUES\CHARACTERCREATE\UI-CHARACTERCREATE-CLASSES">
-                    <Size x="16" y="16"/>
-                    <Anchors><Anchor point="LEFT" relativeTo="$parentWarlockCount" relativePoint="RIGHT" x="8"/></Anchors>
-                </Texture>
                 <FontString name="$parentDruidCount" inherits="GameFontHighlightSmall" text="0">
-                    <Anchors><Anchor point="LEFT" relativeTo="$parentDruidIcon" relativePoint="RIGHT" x="2"/></Anchors>
+                    <Anchors><Anchor point="LEFT" relativeTo="$parentWarlockCount" x="48"/></Anchors>
                 </FontString>
             </Layer>
         </Layers>
@@ -281,6 +241,217 @@
                 <Scripts>
                     <OnClick>
                         GuildManager:ShowAddMemberDialog()
+                    </OnClick>
+                </Scripts>
+            </Button>
+
+            <!-- Class Filter Buttons -->
+            <!-- Warrior -->
+            <Button name="$parentWarriorButton" enableMouse="true">
+                <Size>
+                    <AbsDimension x="20" y="20"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="RIGHT" relativeTo="$parentMemberCount">
+                        <Offset>
+                            <AbsDimension x="20" y="0"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <NormalTexture name="$parentWarriorIcon" file="Interface\GLUES\CHARACTERCREATE\UI-CHARACTERCREATE-CLASSES"/>
+                <HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+                <Scripts>
+                    <OnClick>
+                        GuildManager:FilterByClass("WARRIOR", self)
+                    </OnClick>
+                </Scripts>
+            </Button>
+
+            <!-- Paladin -->
+            <Button name="$parentPaladinButton" enableMouse="true">
+                <Size>
+                    <AbsDimension x="20" y="20"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="LEFT" relativeTo="$parentWarriorButton" relativePoint="RIGHT">
+                        <Offset>
+                            <AbsDimension x="28" y="0"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <NormalTexture name="$parentPaladinIcon" file="Interface\GLUES\CHARACTERCREATE\UI-CHARACTERCREATE-CLASSES"/>
+                <HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+                <Scripts>
+                    <OnClick>
+                        GuildManager:FilterByClass("PALADIN", self)
+                    </OnClick>
+                </Scripts>
+            </Button>
+
+            <!-- Hunter -->
+            <Button name="$parentHunterButton" enableMouse="true">
+                <Size>
+                    <AbsDimension x="20" y="20"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="LEFT" relativeTo="$parentPaladinButton" relativePoint="RIGHT">
+                        <Offset>
+                            <AbsDimension x="28" y="0"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <NormalTexture name="$parentHunterIcon" file="Interface\GLUES\CHARACTERCREATE\UI-CHARACTERCREATE-CLASSES"/>
+                <HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+                <Scripts>
+                    <OnClick>
+                        GuildManager:FilterByClass("HUNTER", self)
+                    </OnClick>
+                </Scripts>
+            </Button>
+
+            <!-- Rogue -->
+            <Button name="$parentRogueButton" enableMouse="true">
+                <Size>
+                    <AbsDimension x="20" y="20"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="LEFT" relativeTo="$parentHunterButton" relativePoint="RIGHT">
+                        <Offset>
+                            <AbsDimension x="28" y="0"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <NormalTexture name="$parentRogueIcon" file="Interface\GLUES\CHARACTERCREATE\UI-CHARACTERCREATE-CLASSES"/>
+                <HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+                <Scripts>
+                    <OnClick>
+                        GuildManager:FilterByClass("ROGUE", self)
+                    </OnClick>
+                </Scripts>
+            </Button>
+
+            <!-- Priest -->
+            <Button name="$parentPriestButton" enableMouse="true">
+                <Size>
+                    <AbsDimension x="20" y="20"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="LEFT" relativeTo="$parentRogueButton" relativePoint="RIGHT">
+                        <Offset>
+                            <AbsDimension x="28" y="0"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <NormalTexture name="$parentPriestIcon" file="Interface\GLUES\CHARACTERCREATE\UI-CHARACTERCREATE-CLASSES"/>
+                <HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+                <Scripts>
+                    <OnClick>
+                        GuildManager:FilterByClass("PRIEST", self)
+                    </OnClick>
+                </Scripts>
+            </Button>
+
+            <!-- Death Knight -->
+            <Button name="$parentDeathKnightButton" enableMouse="true">
+                <Size>
+                    <AbsDimension x="20" y="20"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="LEFT" relativeTo="$parentPriestButton" relativePoint="RIGHT">
+                        <Offset>
+                            <AbsDimension x="28" y="0"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <NormalTexture name="$parentDeathKnightIcon" file="Interface\GLUES\CHARACTERCREATE\UI-CHARACTERCREATE-CLASSES"/>
+                <HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+                <Scripts>
+                    <OnClick>
+                        GuildManager:FilterByClass("DEATHKNIGHT", self)
+                    </OnClick>
+                </Scripts>
+            </Button>
+
+            <!-- Shaman -->
+            <Button name="$parentShamanButton" enableMouse="true">
+                <Size>
+                    <AbsDimension x="20" y="20"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="LEFT" relativeTo="$parentDeathKnightButton" relativePoint="RIGHT">
+                        <Offset>
+                            <AbsDimension x="28" y="0"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <NormalTexture name="$parentShamanIcon" file="Interface\GLUES\CHARACTERCREATE\UI-CHARACTERCREATE-CLASSES"/>
+                <HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+                <Scripts>
+                    <OnClick>
+                        GuildManager:FilterByClass("SHAMAN", self)
+                    </OnClick>
+                </Scripts>
+            </Button>
+
+            <!-- Mage -->
+            <Button name="$parentMageButton" enableMouse="true">
+                <Size>
+                    <AbsDimension x="20" y="20"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="LEFT" relativeTo="$parentShamanButton" relativePoint="RIGHT">
+                        <Offset>
+                            <AbsDimension x="28" y="0"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <NormalTexture name="$parentMageIcon" file="Interface\GLUES\CHARACTERCREATE\UI-CHARACTERCREATE-CLASSES"/>
+                <HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+                <Scripts>
+                    <OnClick>
+                        GuildManager:FilterByClass("MAGE", self)
+                    </OnClick>
+                </Scripts>
+            </Button>
+
+            <!-- Warlock -->
+            <Button name="$parentWarlockButton" enableMouse="true">
+                <Size>
+                    <AbsDimension x="20" y="20"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="LEFT" relativeTo="$parentMageButton" relativePoint="RIGHT">
+                        <Offset>
+                            <AbsDimension x="28" y="0"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <NormalTexture name="$parentWarlockIcon" file="Interface\GLUES\CHARACTERCREATE\UI-CHARACTERCREATE-CLASSES"/>
+                <HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+                <Scripts>
+                    <OnClick>
+                        GuildManager:FilterByClass("WARLOCK", self)
+                    </OnClick>
+                </Scripts>
+            </Button>
+
+            <!-- Druid -->
+            <Button name="$parentDruidButton" enableMouse="true">
+                <Size>
+                    <AbsDimension x="20" y="20"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="LEFT" relativeTo="$parentWarlockButton" relativePoint="RIGHT">
+                        <Offset>
+                            <AbsDimension x="28" y="0"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <NormalTexture name="$parentDruidIcon" file="Interface\GLUES\CHARACTERCREATE\UI-CHARACTERCREATE-CLASSES"/>
+                <HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+                <Scripts>
+                    <OnClick>
+                        GuildManager:FilterByClass("DRUID", self)
                     </OnClick>
                 </Scripts>
             </Button>
