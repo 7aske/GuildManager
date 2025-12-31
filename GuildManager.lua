@@ -18,6 +18,20 @@ local myRankIndex
 local guildName
 local numDisplayed = 15
 
+-- Class icon texcoords (3.3.5a)
+local CLASS_TEX = {
+    WARRIOR     = {0, 0.25, 0, 0.25},
+    MAGE        = {0.25, 0.5, 0, 0.25},
+    ROGUE       = {0.5, 0.75, 0, 0.25},
+    DRUID       = {0.75, 1, 0, 0.25},
+    HUNTER      = {0, 0.25, 0.25, 0.5},
+    SHAMAN      = {0.25, 0.5, 0.25, 0.5},
+    PRIEST      = {0.5, 0.75, 0.25, 0.5},
+    WARLOCK     = {0.75, 1, 0.25, 0.5},
+    PALADIN     = {0, 0.25, 0.5, 0.75},
+    DEATHKNIGHT = {0.25, 0.5, 0.5, 0.75},
+}
+
 -- Initialize the addon
 function GuildManager:OnLoad(frame)
     frame:RegisterEvent("PLAYER_ENTERING_WORLD")
@@ -36,6 +50,7 @@ function GuildManager:OnLoad(frame)
     guildName, _, myRankIndex = GetGuildInfo("player")
 
     DEFAULT_CHAT_FRAME:AddMessage("|cFF00FF00Guild Manager|r v" .. self.version .. " loaded. Type /gman to open.")
+    GuildManager:ToggleFrame()
 end
 
 -- Event handler
@@ -66,6 +81,9 @@ function GuildManager:UpdateGuildRoster()
 
     local numTotalMembers = GetNumGuildMembers()
     local numOnlineMembers = 0
+    local numCharacters = 0
+    local numAlts = 0
+    local classCounts = {}
 
     for i = 1, numTotalMembers do
         local name, rank, rankIndex, level, class, zone, note, officernote, online, status, classFileName = GetGuildRosterInfo(i)
@@ -98,6 +116,17 @@ function GuildManager:UpdateGuildRoster()
                 lastOnline = yearsOffline * 365 * 24 * 60 + monthsOffline * 30 * 24 * 60 + daysOffline * 24 * 60 + hoursOffline * 60,
                 lastOnlineText = self:FormatLastOnline(online, yearsOffline, monthsOffline, daysOffline, hoursOffline)
             })
+
+            if string.find(note, "^[%a]+'?s?%s[Aa]lt$") then
+                numAlts = numAlts + 1
+            else
+                numCharacters = numCharacters + 1
+            end
+
+            -- Count classes
+            if classFileName and classFileName ~= "" then
+                classCounts[classFileName] = (classCounts[classFileName] or 0) + 1
+            end
         end
     end
 
@@ -108,12 +137,47 @@ function GuildManager:UpdateGuildRoster()
         for _, m in ipairs(guildMembers) do
             if m.name == selectedMember.name then
                 selectedMember = m
-                self:ShowEditDialog(selectedMember)
+                self:ShowEditDialog(selectedMember, false)
                 break
             end
         end
     end
+
+    GuildManager:ClassCountRow_Update(classCounts)
     GuildManagerFrameMemberCount:SetText("|cFFFFFFFF" .. numTotalMembers .. "|r" .. " Guild Members (|cFFFFFFFF" .. numOnlineMembers .. "|r |cFF00FF00Online|r)")
+    GuildManagerFrameMemberInfo:SetText("|cFFFFFFFF" .. numCharacters .. "|r" .. " Characters (|cFFFFFFFF" .. numAlts .. "|r |cFF00FF00Alts|r)")
+end
+
+function GuildManager:ClassCountRow_Update(classCounts)
+    -- Mapping XML widgets by class
+    local ROW = GuildManagerFrame:GetName()
+
+    local WIDGETS = {
+        WARRIOR     = { icon = _G[ROW.."WarriorIcon"],     count = _G[ROW.."WarriorCount"] },
+        PALADIN     = { icon = _G[ROW.."PaladinIcon"],     count = _G[ROW.."PaladinCount"] },
+        HUNTER      = { icon = _G[ROW.."HunterIcon"],      count = _G[ROW.."HunterCount"]  },
+        ROGUE       = { icon = _G[ROW.."RogueIcon"],       count = _G[ROW.."RogueCount"]  },
+        PRIEST      = { icon = _G[ROW.."PriestIcon"],      count = _G[ROW.."PriestCount"]  },
+        DEATHKNIGHT = { icon = _G[ROW.."DeathKnightIcon"], count = _G[ROW.."DeathKnightCount"] },
+        SHAMAN      = { icon = _G[ROW.."ShamanIcon"],      count = _G[ROW.."ShamanCount"] },
+        MAGE        = { icon = _G[ROW.."MageIcon"],        count = _G[ROW.."MageCount"] },
+        WARLOCK     = { icon = _G[ROW.."WarlockIcon"],     count = _G[ROW.."WarlockCount"] },
+        DRUID       = { icon = _G[ROW.."DruidIcon"],       count = _G[ROW.."DruidCount"] },
+    }
+
+    for class, data in pairs(WIDGETS) do
+        local count = classCounts[class] or 0
+        data.count:SetText(count)
+        data.icon:SetTexCoord(unpack(CLASS_TEX[class]))
+
+        if count == 0 then
+            data.icon:SetAlpha(0.25)
+            data.count:SetAlpha(0.25)
+        else
+            data.icon:SetAlpha(1)
+            data.count:SetAlpha(1)
+        end
+    end
 end
 
 function GuildManager:FormatLastOnline(online, yearsOffline, monthsOffline, daysOffline, hoursOffline)
@@ -322,6 +386,9 @@ function GuildManager:ToggleFrame()
         GuildManagerFrame:Hide()
     else
         GuildManagerFrame:Show()
+        if not guildName then
+            guildName = GetGuildInfo("player")
+        end
         GuildManagerFrameTitle:SetText("Guild Manager - " .. (guildName or "N/A"))
 
         -- Sync the checkbox with the game's current setting
@@ -394,7 +461,7 @@ function GuildManager:OnEntryClick(button, mouseButton)
 
     -- Left-click (default behavior)
     selectedMember = button.memberData
-    self:ShowEditDialog(selectedMember)
+    self:ShowEditDialog(selectedMember, true)
 end
 
 -- Show the standard Blizzard guild member right-click menu for a given entry button
@@ -408,7 +475,7 @@ function GuildManager:ShowGuildMemberMenu(button)
 end
 
 -- Show edit dialog
-function GuildManager:ShowEditDialog(member)
+function GuildManager:ShowEditDialog(member, updateNotes)
     if not GuildManagerEditDialog then
         DEFAULT_CHAT_FRAME:AddMessage("Guild Manager ERROR: Edit dialog not found!")
         return
@@ -438,12 +505,16 @@ function GuildManager:ShowEditDialog(member)
 
     if publicNoteEdit then
         local incomingText = (member and member.note) or ""
-        publicNoteEdit:SetText(incomingText)
+        if updateNotes then
+            publicNoteEdit:SetText(incomingText)
+        end
     end
 
     if officerNoteEdit then
         local incomingText = (member and member.officernote) or ""
-        officerNoteEdit:SetText(incomingText)
+        if updateNotes then
+            officerNoteEdit:SetText(incomingText)
+        end
     end
 
     -- Update Promote/Demote button enabled state
@@ -512,23 +583,7 @@ function GuildManager:PromoteSelectedMember()
 
     -- Refresh roster and update dialog shortly after
     self:RequestGuildRoster()
-    -- schedule a small delay to allow server update, then refresh dialog display
-    if C_Timer and C_Timer.After then
-        C_Timer.After(0.5, function()
-            -- Update selectedMember info from latest guildMembers (match by name)
-            for _, m in ipairs(guildMembers) do
-                if m.name == selectedMember.name then
-                    selectedMember = m
-                    GuildManagerEditDialogRankValue:SetText(m.rank)
-                    break
-                end
-            end
-            -- update button states
-            if GuildManagerEditDialog:IsShown() then
-                GuildManager:ShowEditDialog(selectedMember)
-            end
-        end)
-    end
+    self:UpdateGuildRoster()
 end
 
 -- Demote selected member (calls Blizzard API)
@@ -543,20 +598,7 @@ function GuildManager:DemoteSelectedMember()
     pcall(function() GuildDemote(selectedMember.name) end)
 
     self:RequestGuildRoster()
-    if C_Timer and C_Timer.After then
-        C_Timer.After(0.5, function()
-            for _, m in ipairs(guildMembers) do
-                if m.name == selectedMember.name then
-                    selectedMember = m
-                    GuildManagerEditDialogRankValue:SetText(m.rank)
-                    break
-                end
-            end
-            if GuildManagerEditDialog:IsShown() then
-                GuildManager:ShowEditDialog(selectedMember)
-            end
-        end)
-    end
+    self:UpdateGuildRoster()
 end
 
 -- Save member edit

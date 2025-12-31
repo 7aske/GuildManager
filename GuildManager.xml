@@ -45,6 +45,114 @@
                         </Anchor>
                     </Anchors>
                 </FontString>
+                <FontString name="$parentMemberInfo" inherits="GameFontNormal" text="Test">
+                    <Size>
+                        <AbsDimension x="180" y="20"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="$parent">
+                            <Offset>
+                                <AbsDimension x="0" y="15"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </FontString>
+
+                <!-- WARRIOR -->
+                <Texture name="$parentWarriorIcon" file="Interface\GLUES\CHARACTERCREATE\UI-CHARACTERCREATE-CLASSES">
+                    <Size x="16" y="16"/>
+                    <Anchors>
+                        <Anchor point="RIGHT" relativeTo="$parentMemberCount">
+                            <Offset>
+                                <AbsDimension x="20"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </Texture>
+                <FontString name="$parentWarriorCount" inherits="GameFontHighlightSmall" text="0" enableMouse="true">
+                    <Anchors><Anchor point="LEFT" relativeTo="$parentWarriorIcon" relativePoint="RIGHT" x="2"/></Anchors>
+                </FontString>
+
+                <!-- PALADIN -->
+                <Texture name="$parentPaladinIcon" file="Interface\GLUES\CHARACTERCREATE\UI-CHARACTERCREATE-CLASSES">
+                    <Size x="16" y="16"/>
+                    <Anchors><Anchor point="LEFT" relativeTo="$parentWarriorCount" relativePoint="RIGHT" x="8"/></Anchors>
+                </Texture>
+                <FontString name="$parentPaladinCount" inherits="GameFontHighlightSmall" text="0">
+                    <Anchors><Anchor point="LEFT" relativeTo="$parentPaladinIcon" relativePoint="RIGHT" x="2"/></Anchors>
+                </FontString>
+
+                <!-- HUNTER -->
+                <Texture name="$parentHunterIcon" file="Interface\GLUES\CHARACTERCREATE\UI-CHARACTERCREATE-CLASSES">
+                    <Size x="16" y="16"/>
+                    <Anchors><Anchor point="LEFT" relativeTo="$parentPaladinCount" relativePoint="RIGHT" x="8"/></Anchors>
+                </Texture>
+                <FontString name="$parentHunterCount" inherits="GameFontHighlightSmall" text="0">
+                    <Anchors><Anchor point="LEFT" relativeTo="$parentHunterIcon" relativePoint="RIGHT" x="2"/></Anchors>
+                </FontString>
+
+                <!-- ROGUE -->
+                <Texture name="$parentRogueIcon" file="Interface\GLUES\CHARACTERCREATE\UI-CHARACTERCREATE-CLASSES">
+                    <Size x="16" y="16"/>
+                    <Anchors><Anchor point="LEFT" relativeTo="$parentHunterCount" relativePoint="RIGHT" x="8"/></Anchors>
+                </Texture>
+                <FontString name="$parentRogueCount" inherits="GameFontHighlightSmall" text="0">
+                    <Anchors><Anchor point="LEFT" relativeTo="$parentRogueIcon" relativePoint="RIGHT" x="2"/></Anchors>
+                </FontString>
+
+                <!-- PRIEST -->
+                <Texture name="$parentPriestIcon" file="Interface\GLUES\CHARACTERCREATE\UI-CHARACTERCREATE-CLASSES">
+                    <Size x="16" y="16"/>
+                    <Anchors><Anchor point="LEFT" relativeTo="$parentRogueCount" relativePoint="RIGHT" x="8"/></Anchors>
+                </Texture>
+                <FontString name="$parentPriestCount" inherits="GameFontHighlightSmall" text="0">
+                    <Anchors><Anchor point="LEFT" relativeTo="$parentPriestIcon" relativePoint="RIGHT" x="2"/></Anchors>
+                </FontString>
+
+                <!-- DEATH KNIGHT -->
+                <Texture name="$parentDeathKnightIcon" file="Interface\GLUES\CHARACTERCREATE\UI-CHARACTERCREATE-CLASSES">
+                    <Size x="16" y="16"/>
+                    <Anchors><Anchor point="LEFT" relativeTo="$parentPriestCount" relativePoint="RIGHT" x="8"/></Anchors>
+                </Texture>
+                <FontString name="$parentDeathKnightCount" inherits="GameFontHighlightSmall" text="0">
+                    <Anchors><Anchor point="LEFT" relativeTo="$parentDeathKnightIcon" relativePoint="RIGHT" x="2"/></Anchors>
+                </FontString>
+
+                <!-- SHAMAN -->
+                <Texture name="$parentShamanIcon" file="Interface\GLUES\CHARACTERCREATE\UI-CHARACTERCREATE-CLASSES">
+                    <Size x="16" y="16"/>
+                    <Anchors><Anchor point="LEFT" relativeTo="$parentDeathKnightCount" relativePoint="RIGHT" x="8"/></Anchors>
+                </Texture>
+                <FontString name="$parentShamanCount" inherits="GameFontHighlightSmall" text="0">
+                    <Anchors><Anchor point="LEFT" relativeTo="$parentShamanIcon" relativePoint="RIGHT" x="2"/></Anchors>
+                </FontString>
+
+                <!-- MAGE -->
+                <Texture name="$parentMageIcon" file="Interface\GLUES\CHARACTERCREATE\UI-CHARACTERCREATE-CLASSES">
+                    <Size x="16" y="16"/>
+                    <Anchors><Anchor point="LEFT" relativeTo="$parentShamanCount" relativePoint="RIGHT" x="8"/></Anchors>
+                </Texture>
+                <FontString name="$parentMageCount" inherits="GameFontHighlightSmall" text="0">
+                    <Anchors><Anchor point="LEFT" relativeTo="$parentMageIcon" relativePoint="RIGHT" x="2"/></Anchors>
+                </FontString>
+
+                <!-- WARLOCK -->
+                <Texture name="$parentWarlockIcon" file="Interface\GLUES\CHARACTERCREATE\UI-CHARACTERCREATE-CLASSES">
+                    <Size x="16" y="16"/>
+                    <Anchors><Anchor point="LEFT" relativeTo="$parentMageCount" relativePoint="RIGHT" x="8"/></Anchors>
+                </Texture>
+                <FontString name="$parentWarlockCount" inherits="GameFontHighlightSmall" text="0">
+                    <Anchors><Anchor point="LEFT" relativeTo="$parentWarlockIcon" relativePoint="RIGHT" x="2"/></Anchors>
+                </FontString>
+
+                <!-- DRUID -->
+                <Texture name="$parentDruidIcon" file="Interface\GLUES\CHARACTERCREATE\UI-CHARACTERCREATE-CLASSES">
+                    <Size x="16" y="16"/>
+                    <Anchors><Anchor point="LEFT" relativeTo="$parentWarlockCount" relativePoint="RIGHT" x="8"/></Anchors>
+                </Texture>
+                <FontString name="$parentDruidCount" inherits="GameFontHighlightSmall" text="0">
+                    <Anchors><Anchor point="LEFT" relativeTo="$parentDruidIcon" relativePoint="RIGHT" x="2"/></Anchors>
+                </FontString>
             </Layer>
         </Layers>
 
@@ -991,6 +1099,5 @@
             </OnMouseUp>
         </Scripts>
     </Frame>
-
 </Ui>
 
