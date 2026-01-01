@@ -357,9 +357,18 @@ function GuildManager:UpdateScrollFrame(members)
         return
     end
 
-    local offset = FauxScrollFrame_GetOffset(scrollFrame)
+    local totalMembers = #members
+    local offset
 
-    FauxScrollFrame_Update(scrollFrame, math.max(numDisplayed + 1, #members), numDisplayed, 22)
+    if numDisplayed > totalMembers then
+        offset = 0
+        FauxScrollFrame_SetOffset(scrollFrame, offset)
+    else
+        offset = FauxScrollFrame_GetOffset(scrollFrame)
+    end
+
+    -- Update scroll frame: total items, visible lines, line height
+    FauxScrollFrame_Update(scrollFrame, math.max(totalMembers, numDisplayed), math.min(numDisplayed, totalMembers), 22)
 
     for i = 1, numDisplayed do
         local index = offset + i
@@ -387,7 +396,7 @@ function GuildManager:UpdateScrollFrame(members)
                 button.lastOnlineText = _G["GuildManagerEntry"..i.."LastOnline"]
             end
 
-            if index <= #members then
+            if index <= totalMembers then
                 local member = members[index]
 
                 -- Store the member data on the button for later access
