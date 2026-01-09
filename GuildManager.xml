@@ -129,13 +129,10 @@
             </Button>
 
             <!-- Search Box -->
-            <EditBox name="$parentSearchBox" autoFocus="false">
+            <EditBox name="$parentSearchBox" autoFocus="false" inherits="InputBoxTemplate">
                 <Size>
                     <AbsDimension x="300" y="30"/>
                 </Size>
-                <TextInsets>
-                    <AbsInset left="6" right="6" top="2" bottom="2"/>
-                </TextInsets>
                 <Anchors>
                     <Anchor point="TOPLEFT">
                         <Offset>
@@ -143,22 +140,6 @@
                         </Offset>
                     </Anchor>
                 </Anchors>
-
-                <Backdrop bgFile="Interface\ChatFrame\ChatFrameBackground" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
-                    <EdgeSize>
-                        <AbsValue val="16"/>
-                    </EdgeSize>
-                    <TileSize>
-                        <AbsValue val="16"/>
-                    </TileSize>
-                    <BackgroundInsets>
-                        <AbsInset left="4" right="4" top="4" bottom="4"/>
-                    </BackgroundInsets>
-                    <Color r="0" g="0" b="0" a="0.5"/>
-                </Backdrop>
-
-                <FontString inherits="ChatFontNormal"/>
-
                 <Scripts>
                     <OnTextChanged>
                         if self:HasFocus() then
@@ -1078,8 +1059,8 @@
                 </Scripts>
             </Button>
 
-            <!-- Public Note Edit Box -->
-            <ScrollFrame name="$parentPublicNoteScroll" inherits="UIPanelScrollFrameTemplate">
+            <!-- Visual background frame -->
+            <Frame name="$parentPublicNote">
                 <Size>
                     <AbsDimension x="240" y="60"/>
                 </Size>
@@ -1091,44 +1072,64 @@
                     </Anchor>
                 </Anchors>
 
-                <Backdrop bgFile="Interface\ChatFrame\ChatFrameBackground" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
-                    <EdgeSize>
-                        <AbsValue val="16"/>
-                    </EdgeSize>
-                    <TileSize>
-                        <AbsValue val="16"/>
-                    </TileSize>
-                    <BackgroundInsets>
-                        <AbsInset left="8" right="8" top="8" bottom="8"/>
-                    </BackgroundInsets>
-                    <Color r="0" g="0" b="0" a="0.5"/>
-                </Backdrop>
-                <ScrollChild>
-                    <EditBox name="$parentEdit" autoFocus="false" multiline="true">
-                        <TextInsets>
-                            <AbsInset left="6" right="6" top="6" bottom="6"/>
-                        </TextInsets>
-                        <Size>
-                            <AbsDimension x="240" y="60"/>
-                        </Size>
-                        <FontString inherits="ChatFontNormal"/>
-                        <Scripts>
-                            <OnEscapePressed>
-                                self:ClearFocus()
-                            </OnEscapePressed>
-                            <OnCursorChanged>
-                                ScrollingEdit_OnCursorChanged(self, x, y, w, h)
-                            </OnCursorChanged>
-                            <OnUpdate>
-                                ScrollingEdit_OnUpdate(self, elapsed, self:GetParent())
-                            </OnUpdate>
-                            <OnTextChanged>
-                                ScrollingEdit_OnTextChanged(self, self:GetParent())
-                            </OnTextChanged>
-                        </Scripts>
-                    </EditBox>
-                </ScrollChild>
-            </ScrollFrame>
+                <Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background"
+                        edgeFile="Interface\Tooltips\UI-Tooltip-Border"
+                        tile="true"
+                        tileSize="16"
+                        edgeSize="4"
+                        insets="4,4,4,4"/>
+                <BackdropColor r="0" g="0" b="0" a="0.25"/>
+                <BackdropBorderColor r="0.6" g="0.6" b="0.6"/>
+
+                <Frames>
+                <!-- ScrollFrame -->
+                <ScrollFrame name="$parentScroll"
+                            inherits="UIPanelScrollFrameTemplate">
+                    <Anchors>
+                        <Anchor point="TOPLEFT">
+                            <Offset>
+                                <AbsDimension x="4" y="-4"/>
+                            </Offset>
+                        </Anchor>
+                        <Anchor point="BOTTOMRIGHT">
+                            <Offset>
+                                <AbsDimension x="-28" y="4"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+
+                    <ScrollChild>
+                        <EditBox name="$parentEdit"
+                                multiline="true"
+                                autoFocus="false">
+                            <Size>
+                                <AbsDimension x="200" y="60"/>
+                            </Size>
+
+                            <FontString inherits="GameFontHighlightSmall"/>
+
+                            <Scripts>
+                                <OnEscapePressed>
+                                    self:ClearFocus();
+                                </OnEscapePressed>
+
+                                <OnCursorChanged>
+                                    ScrollingEdit_OnCursorChanged(self, x, y, w, h);
+                                </OnCursorChanged>
+
+                                <OnUpdate>
+                                    ScrollingEdit_OnUpdate(self, elapsed, self:GetParent());
+                                </OnUpdate>
+
+                                <OnTextChanged>
+                                    ScrollingEdit_OnTextChanged(self, self:GetParent());
+                                </OnTextChanged>
+                            </Scripts>
+                        </EditBox>
+                    </ScrollChild>
+                </ScrollFrame>
+                </Frames>
+            </Frame>
 
             <!-- Officer Note Edit Box -->
             <ScrollFrame name="$parentOfficerNoteScroll" inherits="UIPanelScrollFrameTemplate">
