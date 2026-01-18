@@ -65,7 +65,6 @@ function GuildManager:OnLoad(frame)
     guildName, _, myRankIndex = GetGuildInfo("player")
 
     DEFAULT_CHAT_FRAME:AddMessage("|cFF00FF00Guild Manager|r v" .. self.version .. " loaded. Type /gman to open.")
-    GuildManager:ToggleFrame()
 end
 
 -- Event handler
