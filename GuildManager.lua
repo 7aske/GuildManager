@@ -131,7 +131,7 @@ function GuildManager:UpdateGuildRoster()
                 lastOnlineText = self:FormatLastOnline(online, yearsOffline, monthsOffline, daysOffline, hoursOffline)
             })
 
-            if string.find(note, "^[%a]+'?s?%s[Aa]lt$") then
+            if string.find(note, "^[%a]+'?s?%s[Aa]lt$") or string.find(rank, "[Aa]lt") then
                 numAlts = numAlts + 1
             else
                 numCharacters = numCharacters + 1
