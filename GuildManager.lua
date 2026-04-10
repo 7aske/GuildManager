@@ -774,6 +774,263 @@ function GuildManager:InviteMemberToGroup()
     InviteUnit(selectedMember.name)
 end
 
+-- Run QDKP2 toolbox command for selected member
+function GuildManager:RunQDKP2Toolbox()
+    if not selectedMember or not selectedMember.name then
+        DEFAULT_CHAT_FRAME:AddMessage("|cFFFF0000Guild Manager:|r No member selected.")
+        return
+    end
+
+    if QDKP2GUI_Toolbox.Popup then
+        QDKP2GUI_Toolbox:Popup(selectedMember.name)
+    end
+end
+
+-- Show make alt dialog
+function GuildManager:ShowMakeAltDialog()
+    if not selectedMember or not selectedMember.name then
+        DEFAULT_CHAT_FRAME:AddMessage("|cFFFF0000Guild Manager:|r No member selected.")
+        return
+    end
+
+    local altName = selectedMember.name
+
+    if not StaticPopupDialogs["GUILDMANAGER_MAKE_ALT"] then
+        StaticPopupDialogs["GUILDMANAGER_MAKE_ALT"] = {
+            text = "Select main character for " .. altName .. ":",
+            button1 = "Make Alt",
+            button2 = "Cancel",
+            hasEditBox = true,
+            maxLetters = 128,
+            OnAccept = function(self)
+                local mainName = self.editBox:GetText()
+                if mainName and mainName ~= "" then
+                    if mainName == altName then
+                        DEFAULT_CHAT_FRAME:AddMessage("|cFFFF0000Guild Manager:|r Cannot make a character their own main.")
+                        return
+                    end
+                    DEFAULT_CHAT_FRAME:AddMessage("|cFF00FF00Guild Manager:|r Making " .. altName .. " an alt of " .. mainName)
+                    if QDKP2_MakeAlt then
+                        QDKP2_MakeAlt(altName, mainName)
+                    else
+                        DEFAULT_CHAT_FRAME:AddMessage("|cFFFF0000Guild Manager:|r QDKP2_MakeAlt function not found.")
+                    end
+                else
+                    DEFAULT_CHAT_FRAME:AddMessage("|cFFFF0000Guild Manager:|r No main character entered.")
+                end
+            end,
+            OnShow = function(self)
+                self.editBox:SetText("")
+                self.editBox:ClearFocus()
+                local timerFrame = CreateFrame("Frame")
+                local elapsed = 0
+                timerFrame:SetScript("OnUpdate", function(self, arg)
+                    elapsed = elapsed + arg
+                    if elapsed > 0.1 then
+                        self:SetScript("OnUpdate", nil)
+                        if self.editBox then
+                            GuildManager:CreateAutocompleteDropdown(self.editBox)
+                        end
+                    end
+                end)
+                timerFrame.editBox = self.editBox
+            end,
+            OnHide = function(self)
+                self.editBox:SetText("")
+                GuildManager:HideAutocompleteDropdown()
+            end,
+            timeout = 0,
+            whileDead = true,
+            hideOnEscape = true,
+            preferredIndex = 3,
+        }
+    end
+
+    StaticPopup_Show("GUILDMANAGER_MAKE_ALT")
+end
+
+-- Autocomplete dropdown frame
+local autocompleteDropdown = nil
+local autocompleteButtons = {}
+local selectedAutocompleteIndex = 0
+
+function GuildManager:CreateAutocompleteDropdown(editBox)
+    if not autocompleteDropdown then
+        autocompleteDropdown = CreateFrame("Frame", "GuildManagerAutocompleteDropdown", UIParent)
+        autocompleteDropdown:SetFrameStrata("FULLSCREEN")
+        autocompleteDropdown:SetWidth(200)
+        autocompleteDropdown:SetHeight(150)
+        autocompleteDropdown:Hide()
+        autocompleteDropdown:SetScript("OnUpdate", function(self)
+            if not self:IsShown() then return end
+            local editBox = self.editBox
+            if editBox then
+                self:ClearAllPoints()
+                self:SetPoint("TOPLEFT", editBox, "BOTTOMLEFT", -5, 0)
+            end
+        end)
+
+        for i = 1, 8 do
+            local btn = CreateFrame("Button", "GuildManagerAutocompleteBtn" .. i, autocompleteDropdown)
+            btn:SetHeight(18)
+            btn:SetWidth(190)
+            if i == 1 then
+                btn:SetPoint("TOPLEFT", autocompleteDropdown, "TOPLEFT", 5, -5)
+            else
+                btn:SetPoint("TOPLEFT", autocompleteButtons[i-1], "BOTTOMLEFT", 0, 0)
+            end
+            btn:SetScript("OnClick", function(self)
+                local name = self:GetFontString():GetText()
+                if name and name ~= "" then
+                    editBox:SetText(name)
+                    editBox:SetCursorPosition(#name)
+                    GuildManager:HideAutocompleteDropdown()
+                end
+            end)
+            btn:SetScript("OnEnter", function(self)
+                self:SetBackdropColor(0.3, 0.3, 0.5, 0.8)
+            end)
+            btn:SetScript("OnLeave", function(self)
+                self:SetBackdropColor(0, 0, 0, 0.5)
+            end)
+
+            local fs = btn:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+            fs:SetAllPoints(btn)
+            fs:SetJustifyH("LEFT")
+            fs:SetText("")
+            btn:SetFontString(fs)
+
+            btn:SetNormalTexture("Interface\\ChatFrame\\ChatFrameBackground")
+            btn:GetNormalTexture():SetVertexColor(0, 0, 0, 0.5)
+            btn:SetHighlightTexture("Interface\\QuestFrame\\UI-QuestTitleHighlight")
+            btn:Hide()
+
+            autocompleteButtons[i] = btn
+        end
+    end
+
+    autocompleteDropdown.editBox = editBox
+    editBox:SetScript("OnTextChanged", function(self)
+        GuildManager:UpdateAutocompleteDropdown(self)
+    end)
+    editBox:SetScript("OnEnterPressed", function(self)
+        if autocompleteDropdown:IsShown() and selectedAutocompleteIndex > 0 then
+            local btn = autocompleteButtons[selectedAutocompleteIndex]
+            if btn and btn:IsShown() then
+                local name = btn:GetFontString():GetText()
+                if name and name ~= "" then
+                    self:SetText(name)
+                    self:SetCursorPosition(#name)
+                    GuildManager:HideAutocompleteDropdown()
+                    return
+                end
+            end
+        end
+    end)
+    editBox:SetScript("OnKeyUp", function(self, key)
+        if key == "DOWN" then
+            GuildManager:NavigateAutocomplete(1)
+        elseif key == "UP" then
+            GuildManager:NavigateAutocomplete(-1)
+        elseif key == "TAB" then
+            if autocompleteDropdown:IsShown() and selectedAutocompleteIndex > 0 then
+                local btn = autocompleteButtons[selectedAutocompleteIndex]
+                if btn and btn:IsShown() then
+                    local name = btn:GetFontString():GetText()
+                    if name and name ~= "" then
+                        self:SetText(name)
+                        self:SetCursorPosition(#name)
+                        GuildManager:HideAutocompleteDropdown()
+                    end
+                end
+            end
+        end
+    end)
+end
+
+function GuildManager:UpdateAutocompleteDropdown(editBox)
+    local text = editBox:GetText()
+    if not text or text == "" then
+        GuildManager:HideAutocompleteDropdown()
+        return
+    end
+
+    local search = string.lower(text)
+    local matches = {}
+    for _, member in ipairs(guildMembers) do
+        if member.name and member.name ~= selectedMember.name then
+            local nameLower = string.lower(member.name)
+            if string.find(nameLower, search, 1, true) then
+                table.insert(matches, member.name)
+            end
+        end
+    end
+
+    if #matches == 0 then
+        GuildManager:HideAutocompleteDropdown()
+        return
+    end
+
+    selectedAutocompleteIndex = 1
+
+    for i = 1, 8 do
+        local btn = autocompleteButtons[i]
+        if matches[i] then
+            btn:GetFontString():SetText(matches[i])
+            btn:Show()
+            if i == 1 then
+                btn:GetNormalTexture():SetVertexColor(0.3, 0.3, 0.5, 0.8)
+            else
+                btn:GetNormalTexture():SetVertexColor(0, 0, 0, 0.5)
+            end
+        else
+            btn:Hide()
+        end
+    end
+
+    if not autocompleteDropdown:IsShown() then
+        autocompleteDropdown:Show()
+    end
+end
+
+function GuildManager:NavigateAutocomplete(direction)
+    if not autocompleteDropdown:IsShown() then return end
+
+    local visibleCount = 0
+    for i = 1, 8 do
+        if autocompleteButtons[i]:IsShown() then
+            visibleCount = visibleCount + 1
+        end
+    end
+
+    if visibleCount == 0 then return end
+
+    selectedAutocompleteIndex = selectedAutocompleteIndex + direction
+    if selectedAutocompleteIndex > visibleCount then
+        selectedAutocompleteIndex = 1
+    elseif selectedAutocompleteIndex < 1 then
+        selectedAutocompleteIndex = visibleCount
+    end
+
+    for i = 1, 8 do
+        local btn = autocompleteButtons[i]
+        if btn:IsShown() then
+            if i == selectedAutocompleteIndex then
+                btn:GetNormalTexture():SetVertexColor(0.3, 0.3, 0.5, 0.8)
+            else
+                btn:GetNormalTexture():SetVertexColor(0, 0, 0, 0.5)
+            end
+        end
+    end
+end
+
+function GuildManager:HideAutocompleteDropdown()
+    if autocompleteDropdown then
+        autocompleteDropdown:Hide()
+    end
+    selectedAutocompleteIndex = 0
+end
+
 -- New: Show 'Add Member' dialog to invite a player to the guild
 function GuildManager:ShowAddMemberDialog()
     -- Create a simple StaticPopup dialog for adding a member if it doesn't exist

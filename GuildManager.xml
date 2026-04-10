@@ -898,7 +898,7 @@
     <!-- Edit Member Dialog -->
     <Frame name="GuildManagerEditDialog" parent="UIParent" enableMouse="true" movable="true" frameStrata="MEDIUM" hidden="true">
         <Size>
-            <AbsDimension x="300" y="360"/>
+            <AbsDimension x="300" y="385"/>
         </Size>
         <Anchors>
             <Anchor relativeTo="GuildManagerFrame" point="TOPRIGHT" relativePoint="TOPRIGHT">
@@ -1197,6 +1197,44 @@
                 </ScrollFrame>
                 </Frames>
             </Frame>
+
+            <!-- QDKP2 Toolbox Button -->
+            <Button name="$parentToolboxButton" inherits="UIPanelButtonTemplate" text="DKP">
+                <Size>
+                    <AbsDimension x="100" y="25"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="BOTTOM">
+                        <Offset>
+                            <AbsDimension x="-55" y="90"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnClick>
+                        GuildManager:RunQDKP2Toolbox()
+                    </OnClick>
+                </Scripts>
+            </Button>
+
+            <!-- QDKP2 Make Alt Button -->
+            <Button name="$parentMakeAltButton" inherits="UIPanelButtonTemplate" text="Make Alt">
+                <Size>
+                    <AbsDimension x="100" y="25"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="BOTTOM">
+                        <Offset>
+                            <AbsDimension x="55" y="90"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnClick>
+                        GuildManager:ShowMakeAltDialog()
+                    </OnClick>
+                </Scripts>
+            </Button>
 
             <!-- Save Button -->
             <Button name="$parentSaveButton" inherits="UIPanelButtonTemplate" text="Save">
