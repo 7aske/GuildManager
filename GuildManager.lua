@@ -1107,6 +1107,98 @@ function GuildManager:AddMember(name)
     end
 end
 
+-- Export guild roster to CSV
+function GuildManager:ExportCSV()
+    if not IsInGuild() then
+        DEFAULT_CHAT_FRAME:AddMessage("|cFFFF0000Guild Manager:|r You are not in a guild.")
+        return
+    end
+
+    if #guildMembers == 0 then
+        DEFAULT_CHAT_FRAME:AddMessage("|cFFFF0000Guild Manager:|r No guild members to export.")
+        return
+    end
+
+    local csv = "Name,Level,Class,Rank,Note,Officer Note,Status,Zone\n"
+
+    for _, member in ipairs(guildMembers) do
+        local function escapeCSV(str)
+            if not str then return "" end
+            str = tostring(str)
+            if str:find("[,\"\n]") then
+                str = "\"" .. str:gsub("\"", "\"\"") .. "\""
+            end
+            return str
+        end
+
+        local status = member.online and "Online" or member.lastOnlineText
+        csv = csv .. escapeCSV(member.name) .. ","
+        csv = csv .. member.level .. ","
+        csv = csv .. escapeCSV(member.class) .. ","
+        csv = csv .. escapeCSV(member.rank) .. ","
+        csv = csv .. escapeCSV(member.note) .. ","
+        csv = csv .. escapeCSV(member.officernote) .. ","
+        csv = csv .. escapeCSV(status) .. ","
+        csv = csv .. escapeCSV(member.zone) .. "\n"
+    end
+
+    if not GuildManagerCSVExportFrame then
+        GuildManagerCSVExportFrame = CreateFrame("Frame", "GuildManagerCSVExportFrame", UIParent)
+        GuildManagerCSVExportFrame:SetSize(650, 450)
+        GuildManagerCSVExportFrame:SetPoint("CENTER")
+        GuildManagerCSVExportFrame:SetFrameStrata("FULLSCREEN")
+        GuildManagerCSVExportFrame:Hide()
+
+        GuildManagerCSVExportFrame:SetBackdrop({
+            bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
+            edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
+            tile = true,
+            insets = { left = 11, right = 12, top = 12, bottom = 11 },
+            tileSize = 32,
+            edgeSize = 32
+        })
+
+        local title = GuildManagerCSVExportFrame:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
+        title:SetPoint("TOP", 0, -15)
+        title:SetText("CSV Export")
+
+        local closeBtn = CreateFrame("Button", nil, GuildManagerCSVExportFrame, "UIPanelCloseButton")
+        closeBtn:SetPoint("TOPRIGHT", -5, -5)
+        closeBtn:SetScript("OnClick", function()
+            GuildManagerCSVExportFrame:Hide()
+        end)
+
+        local scrollFrame = CreateFrame("ScrollFrame", "GuildManagerCSVExportScroll", GuildManagerCSVExportFrame, "UIPanelScrollFrameTemplate")
+        scrollFrame:SetSize(610, 380)
+        scrollFrame:SetPoint("TOP", 0, -40)
+
+        local editBox = CreateFrame("EditBox", nil, scrollFrame)
+        editBox:SetSize(580, 380)
+        editBox:SetMultiLine(true)
+        editBox:SetAutoFocus(false)
+        editBox:SetFontObject(GameFontHighlightSmall)
+        editBox:SetTextInsets(5, 5, 3, 3)
+        scrollFrame:SetScrollChild(editBox)
+
+        GuildManagerCSVExportFrame.editBox = editBox
+    end
+
+    local frame = GuildManagerCSVExportFrame
+    frame.editBox:SetText(csv)
+    frame.editBox:SetFocus()
+    frame.editBox:SetCursorPosition(0)
+    frame.editBox:HighlightText(0, #csv)
+
+    if GuildManagerFrame and GuildManagerFrame:IsVisible() then
+        frame:SetPoint("CENTER", GuildManagerFrame, "CENTER")
+    else
+        frame:SetPoint("CENTER")
+    end
+
+    frame:Show()
+    DEFAULT_CHAT_FRAME:AddMessage("|cFF00FF00Guild Manager:|r CSV exported. " .. #guildMembers .. " members.")
+end
+
 function HasPermission(targetName)
     if not IsInGuild() then
         return false, "Not in a guild."

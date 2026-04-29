@@ -217,6 +217,25 @@
                 </Scripts>
             </Button>
 
+            <!-- Export CSV Button -->
+            <Button name="$parentExportCSVButton" inherits="UIPanelButtonTemplate" text="Export CSV">
+                <Size>
+                    <AbsDimension x="120" y="25"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="RIGHT" relativeTo="$parentAddMemberButton" relativePoint="LEFT">
+                        <Offset>
+                            <AbsDimension x="-10" y="0"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnClick>
+                        GuildManager:ExportCSV()
+                    </OnClick>
+                </Scripts>
+            </Button>
+
             <!-- Class Filter Buttons -->
             <!-- Warrior -->
             <Button name="$parentWarriorButton" enableMouse="true">
@@ -1315,6 +1334,81 @@
                 </Scripts>
             </Button>
         </Frames>
+
+        <!-- CSV Export Frame -->
+        <Frame name="$parentCSVExport" parent="$parent" hidden="true">
+            <Size>
+                <AbsDimension x="650" y="450"/>
+            </Size>
+            <Anchors>
+                <Anchor point="CENTER" relativeTo="$parent"/>
+            </Anchors>
+            <Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+                <BackgroundInsets>
+                    <AbsInset left="11" right="12" top="12" bottom="11"/>
+                </BackgroundInsets>
+                <TileSize>
+                    <AbsValue val="32"/>
+                </TileSize>
+                <EdgeSize>
+                    <AbsValue val="32"/>
+                </EdgeSize>
+            </Backdrop>
+
+            <Layers>
+                <Layer level="ARTWORK">
+                    <FontString name="$parentTitle" inherits="GameFontNormalLarge">
+                        <Anchors>
+                            <Anchor point="TOP">
+                                <Offset>
+                                    <AbsDimension x="0" y="-15"/>
+                                </Offset>
+                            </Anchor>
+                        </Anchors>
+                        <Text>CSV Export</Text>
+                    </FontString>
+                </Layer>
+            </Layers>
+
+            <Frames>
+                <Button name="$parentCloseButton" inherits="UIPanelCloseButton">
+                    <Anchors>
+                        <Anchor point="TOPRIGHT">
+                            <Offset>
+                                <AbsDimension x="-5" y="-5"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                    <Scripts>
+                        <OnClick>
+                            GuildManagerFrameCSVExport:Hide()
+                        </OnClick>
+                    </Scripts>
+                </Button>
+
+                <ScrollFrame name="$parentScroll" inherits="UIPanelScrollFrameTemplate">
+                    <Size>
+                        <AbsDimension x="610" y="380"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="TOP">
+                            <Offset>
+                                <AbsDimension x="0" y="-40"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                    <ScrollChild>
+                        <EditBox name="$parentEdit" multiline="true" autoFocus="false">
+                            <Size>
+                                <AbsDimension x="580" y="380"/>
+                            </Size>
+                            <FontString inherits="GameFontHighlightSmall"/>
+                            <TextInsets left="5" right="5" top="3" bottom="3"/>
+                        </EditBox>
+                    </ScrollChild>
+                </ScrollFrame>
+            </Frames>
+        </Frame>
 
         <Scripts>
             <OnMouseDown>
